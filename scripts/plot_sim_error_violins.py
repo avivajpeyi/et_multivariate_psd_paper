@@ -5,6 +5,8 @@ import paths
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+from matplotlib import ticker
+
 
 
 
@@ -31,7 +33,7 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
     for partname in ('cbars', 'cmins', 'cmaxes', 'cmedians'):
         vp = parts[partname]
         vp.set_edgecolors(colors)
-        vp.set_linewidth(5)
+        vp.set_linewidth(1.5)
 
     # Add legend
     if legend_labels:
@@ -42,6 +44,8 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
     ax.set_xticks([1.25, 3.25, 5.25])
     ax.set_xticklabels(['256', '512', '1024'])
     ax.set_ylabel('L2 Errors')
+    ax.xaxis.set_minor_locator(ticker.NullLocator())
+    ax.yaxis.set_minor_locator(ticker.NullLocator())
 
 
 
@@ -62,9 +66,9 @@ add_violin_plot(axs[1], violin_data2, positions, colors)
 
 
 # Annotate subplots
-axs[0].text(0.02, 0.98, '(a)', transform=axs[0].transAxes, fontsize=16, verticalalignment='top', horizontalalignment='left')
-axs[1].text(0.02, 0.98, '(b)', transform=axs[1].transAxes, fontsize=16, verticalalignment='top', horizontalalignment='left')
+axs[0].text(0.02, 0.98, '(a)', transform=axs[0].transAxes, fontsize=12, verticalalignment='top', horizontalalignment='left')
+axs[1].text(0.02, 0.98, '(b)', transform=axs[1].transAxes, fontsize=12, verticalalignment='top', horizontalalignment='left')
 axs[1].set_xlabel("Data Length")
 plt.subplots_adjust(hspace=0.)  # Adjust as needed
-plt.savefig(f"{paths.figures}/sim_error_violins_with_panel.pdf", dpi=300)
+plt.savefig(f"{paths.figures}/sim_error_violins.pdf", dpi=300)
 plt.close()
