@@ -49,26 +49,31 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
 
 
 
-# First panel: Original violin plot
-colors = ['C0', 'C1'] * 3
-legend_labels = ['VNPC', 'VB']
+def main():
+    # First panel: Original violin plot
+    colors = ['C0', 'C1'] * 3
+    legend_labels = ['VNPC', 'VB']
 
-positions = [1, 1.5, 3, 3.5, 5, 5.5]
+    positions = [1, 1.5, 3, 3.5, 5, 5.5]
 
-# Load data
-violin_data1 = pd.read_csv(f"{paths.data}/L2_errors_var2.csv").values
-violin_data2 = pd.read_csv(f"{paths.data}/L2_errors_vma1.csv").values
-
-
-fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
-add_violin_plot(axs[0], violin_data1, positions, colors, legend_labels)
-add_violin_plot(axs[1], violin_data2, positions, colors)
+    # Load data
+    violin_data1 = pd.read_csv(f"{paths.data}/L2_errors_var2.csv").values
+    violin_data2 = pd.read_csv(f"{paths.data}/L2_errors_vma1.csv").values
 
 
-# Annotate subplots
-axs[0].text(0.02, 0.98, '(a)', transform=axs[0].transAxes, fontsize=12, verticalalignment='top', horizontalalignment='left')
-axs[1].text(0.02, 0.98, '(b)', transform=axs[1].transAxes, fontsize=12, verticalalignment='top', horizontalalignment='left')
-axs[1].set_xlabel("Data Length")
-plt.subplots_adjust(hspace=0.)  # Adjust as needed
-plt.savefig(f"{paths.figures}/sim_error_violins.pdf", dpi=300)
-plt.close()
+    fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
+    add_violin_plot(axs[0], violin_data1, positions, colors, legend_labels)
+    add_violin_plot(axs[1], violin_data2, positions, colors)
+
+
+    # Annotate subplots
+    axs[0].text(0.02, 0.98, 'a)', transform=axs[0].transAxes, fontsize=10, verticalalignment='top', horizontalalignment='left')
+    axs[1].text(0.02, 0.98, 'b)', transform=axs[1].transAxes, fontsize=10, verticalalignment='top', horizontalalignment='left')
+    axs[1].set_xlabel("Data Length")
+    plt.subplots_adjust(hspace=0.)  # Adjust as needed
+    plt.savefig(f"{paths.figures}/sim_error_violins.pdf", dpi=300)
+    plt.close()
+
+
+if __name__ == "__main__":
+    main()
