@@ -551,33 +551,17 @@ In order to avoid underfitting in SGVB, we use the approach described in Section
 
 Based on the Figures \ref{var2 basis funs vs mle} and \ref{vma1 basis funs vs mle}, for each length of the two models, the number of basis functions can be fixed at 30. The following violin plots (Figures \ref{l2 var2} and \ref{l2 vma1}) show the  $L_2$ errors over the 500 realizations for each method, model, and sample size. For the SGVB method, the Python package Hyperopt is used to optimise the $\tau_1$, the range is from 0.002 to 0.02 and the number of evaluations is 10, $\tau_2$ is set to 0.05.
 The parameters of the VNPC method and the number of iterations of MCMC are kept the same with \cite{LiuYixuan2024Ancl}  when conducting the same experiment. 
-\begin{figure*}
-\centering
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=18cm]{L2 errors var2.png}
-\end{subfigure}
+\begin{figure}
+\begin{minipage}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{sim_error_violins.pdf}
+  \caption{
+  \avi{Lets use violin plots 
+ for this instead of box plots}
+  Violin plots of 500  $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of the VAR(2) model with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the SGVB method.}
+  \label{l2 var2}
+\end{minipage}
+\end{figure}
 
-\caption{
-\avi{Lets use violin plots for this instead of box plots}
-Violin plots of 500  $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of the VAR(2) model with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the SGVB method.}
-\label{l2 var2}
-\end{figure*}
-
-%\begin{figure*}
-%\centering
-%\includegraphics[width=18cm]{PYR Jianan/L1 Errors for VNPC and VI Methods %for VMA(1) model.png}
-%\end{figure*}
-
-\begin{figure*}
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=18cm]{L2 errors vma1.png}
-\end{subfigure}
-
-\caption{Violin plots of 500 $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of  the VMA(1) model with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the  SGVB method.}
-\label{l2 vma1}
-\end{figure*}
 
 The following two tables present the average  $L_2$ errors, empirical coverage and median width of pointwise 90\% credible regions as well as the average computation time per realization (in seconds), for the 500 realizations of both models using the VNPC and SGVB methods. \hyperref[table l1l2 var2]{Table 1} gives the results for  the VAR(2) model, while the \hyperref[table l1l2 vma1]{Table 2} displays those for  the VMA(1) model.
 
