@@ -20,7 +20,7 @@ def plot_coherences(coherence_file_path, ax=None):
         coh_lower = f['ETnoise_correlated_GP_coh_lower_XYZ'][:]
         coh_upper = f['ETnoise_correlated_GP_coh_upper_XYZ'][:]
 
-    if axes is None:
+    if ax is None:
         fig, ax = plt.subplots(1, 1)
     ax.set_xlim([5, 128])
     for i, label in enumerate(['XY', 'XZ', 'YZ']):
