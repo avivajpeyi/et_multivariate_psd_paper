@@ -31,9 +31,8 @@ def main():
     ax.set_ylim(bottom=-300)
     ax.set_xlim(x[0],x[-1])
 
-
-    plt.xlabel('Number of Chunks', fontsize=15)
-    plt.ylabel(r'Relative $\log \mathcal{L}(\theta|d)$', fontsize=15)
+    plt.xlabel(r'$N_b$', fontsize=15)
+    plt.ylabel(r'Relative $\log \mathcal{L}(d|\theta)$', fontsize=15)
     secax = ax.secondary_xaxis('top')
     ax.xaxis.set_tick_params(which='minor',top=False, bottom=False)
     secax.xaxis.set_tick_params(which='minor',top=False, bottom=False)
