@@ -16,5 +16,10 @@ figures = src / "figures"
 rc_file = scripts / "matplotlibrc"
 font_file = scripts / "LiberationSans.ttf"
 
-font_manager.fontManager.addfont(font_file)
+font_file = Path(font_file)
+if font_file.exists():
+    font_manager.fontManager.addfont(str(font_file))
+else:
+    print(f"Font file not found: {font_file}")
+
 matplotlib.rc_file(rc_file)
