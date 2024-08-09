@@ -236,14 +236,7 @@ def main():
         axes=axes,
         label="Case C PSD"
     )
-    
-    axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
-        psd_col="C2",
-        axes=axes,
-        label="Case C PSD"
-    )
+
 
     axes[0, 2].legend(
         handles=[
