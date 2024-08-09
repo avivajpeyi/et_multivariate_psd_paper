@@ -3,9 +3,7 @@ import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 import paths
-from matplotlib.ticker import MaxNLocator
-from matplotlib.ticker import FixedLocator
-
+from matplotlib.lines import Line2D
 
 PSD_FILL_ALPHA = 0.5
 SYM_THRESH = 1e-49
@@ -15,11 +13,10 @@ TICK_LN = 5
 def plot_et_matrix(
         channel_pth,
         matrix_file_path,
-        coherence_file_path,
-        coherence_plot_fname,
         psd_plot_fname=None,
         psd_col = "C0",
-        axes=None
+        axes=None,
+        label=""
 ):
     channels = []
     for i, c in enumerate('XYZ'):
@@ -56,8 +53,9 @@ def plot_et_matrix(
     freq_range = total_len / time_interval / 2
     freq = freq_original[0:int(required_part / freq_range * freq_original.shape[0])]
 
-    fig, axes = plt.subplots(3, 3, figsize=(10, 10), sharex=True)
-    from matplotlib.lines import Line2D
+    if axes is None:
+        fig, axes = plt.subplots(3, 3, figsize=(10, 10), sharex=True)
+
 
     for i in range(3):
         for j in range(3):
@@ -65,7 +63,7 @@ def plot_et_matrix(
                 f, Pxx_den0 = signal.periodogram(channels[:, i], fs=channels.shape[0] / time_interval)
                 f = f[1:]
                 Pxx_den0 = Pxx_den0[1:] / 2
-                axes[i, j].plot(f, Pxx_den0, marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3)
+                axes[i, j].plot(f, Pxx_den0, marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].plot(freq, spec_mat_median[..., i, i] / (q) ** 2 / (freq_original[-1] / 0.5), linewidth=1,
                                 color=psd_col, linestyle="-")
@@ -102,7 +100,7 @@ def plot_et_matrix(
                 cross_spectrum_fij = y[:, i] * np.conj(y[:, j])
 
                 axes[i, j].plot(f, np.real(cross_spectrum_fij) / (freq_original[-1] / 0.5),
-                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3)
+                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].text(0.95, 0.95, r'$\Re(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
@@ -131,7 +129,7 @@ def plot_et_matrix(
                 cross_spectrum_fij = y[:, i] * np.conj(y[:, j])
 
                 axes[i, j].plot(f, np.imag(cross_spectrum_fij) / (freq_original[-1] / 0.5),
-                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3)
+                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].text(0.95, 0.95, r'$\Im(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
@@ -145,18 +143,19 @@ def plot_et_matrix(
     axes[0, 2].legend(
         handles=[
             Line2D([], [], color='lightgray', label='Periodogram', lw=3),
-            Line2D([], [], color=psd_col, label='Estimated PSD', lw=3)
+            Line2D([], [], color=psd_col, label=label, lw=3)
         ],
         loc='lower right', fontsize=10)
 
-    # remove space ebtween subplots
-    plt.subplots_adjust(hspace=0., wspace=0.)
+
 
     diag_ylims = (min([axes[i, i].get_ylim()[0] for i in range(3)]), max([axes[i, i].get_ylim()[1] for i in range(3)]))
     off_ylims = (min([axes[i, j].get_ylim()[0] for i in range(3) for j in range(3) if i != j]),
                  max([axes[i, j].get_ylim()[1] for i in range(3) for j in range(3) if i != j]))
 
-    #  Adjust position of y tick labels
+    ###  Adjust axes
+    # remove space ebtween subplots
+    plt.subplots_adjust(hspace=0., wspace=0.)
     for rowi in range(3):
         for colj in range(3):
             ax = axes[rowi, colj]
@@ -167,7 +166,6 @@ def plot_et_matrix(
                 label.set_horizontalalignment('left')
 
             if rowi == colj:
-
                 # increase ax-spine linewidth
                 for spine in ax.spines.values():
                     spine.set_linewidth(1.75)
@@ -185,67 +183,42 @@ def plot_et_matrix(
     # plt.show()
     if psd_plot_fname:
         plt.savefig(psd_plot_fname, dpi=300)
-    #
-    # #---------------------------------------------------------------------------------------------------------
-    # #estimated squared coherence (median, lower, upper)
-    with h5py.File(coherence_file_path, 'r') as f:
-        coh_med = f['ETnoise_correlated_GP_coh_median_XYZ'][:]
-        coh_lower = f['ETnoise_correlated_GP_coh_lower_XYZ'][:]
-        coh_upper = f['ETnoise_correlated_GP_coh_upper_XYZ'][:]
-
-    fig, ax = plt.subplots(1,1)
-    plt.xlim([5, 128])
-    plt.plot(freq, np.squeeze(coh_med[:,0]), color = 'C1', linestyle="-", label = 'X Y')
-    plt.fill_between(freq, np.squeeze(coh_lower[:,0]), np.squeeze(coh_upper[:,0]),
-                        color = ['C1'], alpha = PSD_FILL_ALPHA)
+    else:
+        return axes
 
 
-    plt.plot(freq, np.squeeze(coh_med[:,1]), color = 'C2', linestyle="-", label = 'X Z')
-    plt.fill_between(freq, np.squeeze(coh_lower[:,1]), np.squeeze(coh_upper[:,1]),
-                        color = ['C2'], alpha = PSD_FILL_ALPHA)
+def main():
+    plot_et_matrix(
+        channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
+        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
+        psd_plot_fname=f'{paths.figures}/et_psds/caseA_psd.pdf',
+        label="Case A PSD"
+    )
 
+    axes = plot_et_matrix(
+        channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
+        matrix_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
+        psd_col="C1",
+        label="Case B PSD"
+    )
 
-    plt.plot(freq, np.squeeze(coh_med[:,2]), color = 'red', linestyle="-", label = 'Y Z')
-    plt.fill_between(freq, np.squeeze(coh_lower[:,2]), np.squeeze(coh_upper[:,2]),
-                        color = ['C3'], alpha = PSD_FILL_ALPHA)
+    axes = plot_et_matrix(
+        channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
+        matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
+        psd_col="C2",
+        axes=axes,
+        label="Case C PSD"
+    )
 
-    plt.xlabel('Frequency [Hz]', fontsize=20, labelpad=10)
-    plt.ylabel('Squared Coherency', fontsize=20, labelpad=10)
-    #plt.title('Squared coherence for ET noise with correlated GP', pad=20, fontsize = 20)
+    axes[0, 2].legend(
+        handles=[
+            Line2D([], [], color='lightgray', label='Periodogram', lw=3),
+            Line2D([], [], color="C1", label="Case B PSD", lw=3),
+            Line2D([], [], color="C2", label="Case C PSD", lw=3)
+        ],
+        loc='lower right', fontsize=10)
 
-    plt.legend(loc='upper left', fontsize='medium')
-    plt.ylim(bottom=0)
+    axes[0,0].get_figure().savefig(f'{paths.figures}/et_psds/caseBC_psd.pdf')
 
-    plt.grid(True)
-    plt.savefig(coherence_plot_fname, dpi=300)
-
-
-
-
-
-
-plot_et_matrix(
-    channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
-    matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
-    coherence_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_squared_coh_XYZ.hdf5',
-    coherence_plot_fname=f'{paths.figures}/et_psds/caseA_coh.pdf',
-    psd_plot_fname=f'{paths.figures}/et_psds/caseA_psd.pdf',
-)
-
-plot_et_matrix(
-    channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
-    matrix_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
-    coherence_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_squared_coh_XYZ.hdf5',
-    coherence_plot_fname=f'{paths.figures}/et_psds/caseB_coh.pdf',
-    psd_plot_fname=f'{paths.figures}/et_psds/caseB_psd.pdf',
-)
-
-plot_et_matrix(
-    channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
-    matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
-    coherence_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_squared_coh_XYZ.hdf5',
-    coherence_plot_fname=f'{paths.figures}/et_psds/caseC_coh.pdf',
-    psd_plot_fname=f'{paths.figures}/et_psds/caseC_psd.pdf',
-)
-
-
+if __name__ == '__main__':
+    main()

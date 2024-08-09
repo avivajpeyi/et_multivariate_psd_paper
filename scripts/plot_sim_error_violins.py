@@ -26,7 +26,7 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
     # Customize violins
     for i, pc in enumerate(parts['bodies']):
         pc.set_facecolor(colors[i])
-        pc.set_edgecolor(colors[i])
+        pc.set_edgelinewidth(0)
         pc.set_alpha(0.5)
 
     for partname in ('cbars', 'cmins', 'cmaxes', 'cmedians'):
