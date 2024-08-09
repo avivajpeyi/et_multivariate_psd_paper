@@ -191,7 +191,7 @@ def main():
     plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
         matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
-        psd_plot_fname=f'{paths.figures}/et_psds/caseA_psd.pdf',
+        psd_plot_fname=f'{paths.figures}/caseA_psd.pdf',
         label="Case A PSD"
     )
 
@@ -201,7 +201,6 @@ def main():
         psd_col="C1",
         label="Case B PSD"
     )
-
     axes = plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
         matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
@@ -218,7 +217,7 @@ def main():
         ],
         loc='lower right', fontsize=10)
 
-    axes[0,0].get_figure().savefig(f'{paths.figures}/et_psds/caseBC_psd.pdf')
+    axes[0,0].get_figure().savefig(f'{paths.figures}/caseBC_psd.pdf')
 
 if __name__ == '__main__':
     main()
