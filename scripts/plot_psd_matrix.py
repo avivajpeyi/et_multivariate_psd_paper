@@ -4,6 +4,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 import paths
 from matplotlib.lines import Line2D
+import pandas as pd
 
 PSD_FILL_ALPHA = 0.5
 SYM_THRESH = 1e-49
@@ -11,6 +12,7 @@ TICK_LN = 5
 THICKNESS = 2
 
 LABELS = ['X', 'Y', 'Z']
+TRUE_STYLE = dict(color='k', lw=0.8, ls="-", alpha=0.6)
 
 def plot_et_matrix(
         channel_pth,
@@ -34,6 +36,23 @@ def plot_et_matrix(
         spec_mat_median = f['ETnoise_correlated_GP_spec_mat_median_XYZ'][:]
         spec_mat_lower = f['ETnoise_correlated_GP_spec_mat_lower_XYZ'][:]
         spec_mat_upper = f['ETnoise_correlated_GP_spec_mat_upper_XYZ'][:]
+        
+    # upload the true psd data
+    file_path =f'{paths.data}/\ET(1).txt'
+    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak10Hz_new.txt'
+    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak50Hz_new.txt'
+    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak90Hz_new.txt'
+    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    x_channel_real = ((ET_1[:,1] + Peak10Hz[:,1] + Peak50Hz[:,1])**2)/2
+    y_channel_real = ((ET_1[:,1] + Peak10Hz[:,1] + Peak90Hz[:,1])**2)/2
+    z_channel_real = ((ET_1[:,1] + Peak50Hz[:,1] + Peak90Hz[:,1])**2)/2
 
     q = 10 ** 22 / 1.0
     time_interval = 2000
@@ -54,6 +73,7 @@ def plot_et_matrix(
     total_len = channels.shape[0]
     freq_range = total_len / time_interval / 2
     freq = freq_original[0:int(required_part / freq_range * freq_original.shape[0])]
+    freq_true = ET_1[:,0]
 
     if axes is None:
         fig, axes = plt.subplots(3, 3, figsize=(10, 10), sharex=True)
@@ -85,6 +105,13 @@ def plot_et_matrix(
                 axes[i, j].set_ylim([10 ** (-52), 10 ** (-46)])
                 axes[i, j].set_yscale('log')
 
+
+                if i == 0:
+                    axes[i, j].plot(freq_true, x_channel_real, **TRUE_STYLE)
+                elif i == 1:
+                    axes[i, j].plot(freq_true, y_channel_real,**TRUE_STYLE)
+                elif i == 2:
+                    axes[i, j].plot(freq_true, z_channel_real, **TRUE_STYLE)
 
 
             elif i < j:
@@ -151,7 +178,8 @@ def plot_et_matrix(
     axes[0, 2].legend(
         handles=[
             Line2D([], [], color='lightgray', label='Periodogram', lw=3),
-            Line2D([], [], color=psd_col, label=label, lw=3)
+            Line2D([], [], color=psd_col, label=label, lw=3),
+            Line2D([],[],  label='True PSD', **TRUE_STYLE)
         ],
         loc='lower right', fontsize=10)
 
@@ -217,11 +245,13 @@ def main():
         label="Case C PSD"
     )
 
+
     axes[0, 2].legend(
         handles=[
             Line2D([], [], color='lightgray', label='Periodogram', lw=3),
             Line2D([], [], color="C1", label="Case B PSD", lw=3),
-            Line2D([], [], color="C2", label="Case C PSD", lw=3)
+            Line2D([], [], color="C2", label="Case C PSD", lw=3),
+    Line2D([], [], label='True PSD', **TRUE_STYLE)
         ],
         loc='lower right', fontsize=10)
 
