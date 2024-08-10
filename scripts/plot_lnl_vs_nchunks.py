@@ -23,7 +23,7 @@ def main():
 
 
     ax.plot(x, lnl_quantiles[1], label='With Chunks', color=f"C1")
-    ax.fill_between(x, lnl_quantiles[0], lnl_quantiles[2], color=f"C1", alpha=0.3)
+    ax.fill_between(x, lnl_quantiles[0], lnl_quantiles[2], color=f"C1", alpha=0.3, lw=0)
 
     power_labels = [f'$2^{i}$' for i in x]
     ax.set_xticks(x)

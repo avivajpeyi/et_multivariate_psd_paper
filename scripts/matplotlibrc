@@ -38,10 +38,10 @@ savefig.bbox : tight
 savefig.pad_inches : 0.05
 
 # Font Family
-font.family: sans-serif
-mathtext.fontset: custom
-font.cursive: Liberation Sans
-font.sans-serif: Liberation Sans
+font.family: STIXGeneral
+mathtext.fontset: stix
+font.cursive: STIXGeneral
+font.sans-serif: Times New Roman
 
 
 

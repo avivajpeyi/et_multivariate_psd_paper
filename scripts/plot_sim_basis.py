@@ -23,18 +23,19 @@ def main():
 
 
     plot_basis_vs_lnl(ax, DATA[:, 3:])
-    plot_basis_vs_lnl(ax, DATA[:, :3], kwgs=dict(ls='--'))
+    plot_basis_vs_lnl(ax, DATA[:, :3], kwgs=dict(ls='dotted'))
 
     # custom legend
     lnkwg = dict(lw=2)
     lgd = ax.legend(handles=
     [
-        Line2D([0], [0], color='k', lw=2, label='VAR(2)'),
-        Line2D([0], [0], color='k', lw=2, label='VMA(1)', ls='--'),
         Line2D([0], [0], color='C0', lw=2, label='n=256'),
         Line2D([0], [0], color='C1', lw=2, label='n=512'),
         Line2D([0], [0], color='C2', lw=2, label='n=1024'),
-    ], loc='upper left', bbox_to_anchor=(1.02, 1), borderaxespad=0)
+        Line2D([0], [0], color='k', lw=2, label='VAR(2)'),
+        Line2D([0], [0], color='k', lw=2, label='VMA(1)', ls='dotted'),
+    ], loc='lower right', ncols=2, labelspacing=0.05, columnspacing=0.25, handlelength=1)
+    # bbox_to_anchor=(1.02, 1), borderaxespad=0)
     plt.xlabel(r'$M$')
     plt.ylabel(r'Normalised $\log \mathcal{L}(d|\theta)$')
     plt.xlim(min(X), max(X))

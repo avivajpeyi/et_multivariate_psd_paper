@@ -8,7 +8,9 @@ from matplotlib.lines import Line2D
 PSD_FILL_ALPHA = 0.5
 SYM_THRESH = 1e-49
 TICK_LN = 5
+THICKNESS = 2
 
+LABELS = ['X', 'Y', 'Z']
 
 def plot_et_matrix(
         channel_pth,
@@ -59,6 +61,11 @@ def plot_et_matrix(
 
     for i in range(3):
         for j in range(3):
+
+            axes[i, j].text(0.05, 0.95, f"{LABELS[i]}{LABELS[j]}", transform=axes[i, j].transAxes,
+                            horizontalalignment='left', verticalalignment='top', fontsize=14)
+
+
             if i == j:
                 f, Pxx_den0 = signal.periodogram(channels[:, i], fs=channels.shape[0] / time_interval)
                 f = f[1:]
@@ -77,6 +84,7 @@ def plot_et_matrix(
                 axes[i, j].set_xlim([5, 128])
                 axes[i, j].set_ylim([10 ** (-52), 10 ** (-46)])
                 axes[i, j].set_yscale('log')
+
 
 
             elif i < j:
@@ -168,11 +176,11 @@ def plot_et_matrix(
             if rowi == colj:
                 # increase ax-spine linewidth
                 for spine in ax.spines.values():
-                    spine.set_linewidth(1.75)
+                    spine.set_linewidth(THICKNESS)
                     spine.set_zorder(10)
                 ax.set_ylim(diag_ylims)
                 ax.set_yticks([1e-51, 1e-49, 1e-47])
-                ax.tick_params('both', length=TICK_LN, width=1.75, which='major')
+                ax.tick_params('both', length=TICK_LN, width=THICKNESS, which='major')
 
             else:
                 ax.set_ylim(off_ylims)
