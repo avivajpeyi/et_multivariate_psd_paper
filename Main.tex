@@ -278,6 +278,8 @@ The variation of parameters ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(
 The likelihood (\ref{eq:likelihoodj}) measures the compatibility of data to the spectral density parameterized by ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(\theta^{(k)}_{j\cdot})$). As $M$ increases from a very small value, $\mathcal{L}(\d|\S)$ is expected to increase and does not change much when $M$ is sufficiently large. The maximum likelihood estimate (MLE) is relatively cheap to compute and we compare $\log \mathcal{L}(\d|\S)$ at the MLE for a range of values of $M$ and choose $M$ as the smallest value where $\mathcal{L}(\d|\S)$ does not increase significantly. In the application, we chose a conservative value of $M$ to avoid under-fitting. 
  
 
+
+
 %\RM{In addition to showing the log-likelihood values for increasing number of basis functions, does this also affect the smoothness of the psd estimate? I expect more wiggly curves with larger $M$, smoother curves with low $M$. Or won't we see that effect because of the penalization by the prior?}
 
 
@@ -299,10 +301,27 @@ we suggest how to choose the optimal learning rate and automate the procedure. L
 Instead of searching for $\tau_1^*$ over a grid of potential values, we automate this procedure using the Python package \texttt{Hyperopt} \cite{Bergstra2013}. This package implements the Tree-structured Parzen Estimator (TPE) algorithm, a sophisticated approach to hyperparameter optimization. TPE begins by randomly sampling initial hyperparameter configurations from a predefined space and evaluating their corresponding objective function values. In this specific application, the hyperparameter here refers to $\tau_1$, while the objective function value y corresponds to the negative minimised evidence lower bound (ELBO). The algorithm then selects a threshold $y^*$ based on the $\gamma$-percentile of the best-performing objective function values. In this case, this means selecting a threshold based on the lowest negative ELBO values achieved. Using this threshold, TPE constructs two probability distributions via Gaussian mixture models: $l(\tau_1) = p(\tau_1|y < y^*)$ representing the distribution of learning rates performing better than the threshold, and $g(\tau_1) = p(\tau_1|y \geq y^*)$ for those performing worse. In each evaluation, the algorithm samples multiple candidates $\tau_1$ from $l(\tau_1)$ and evaluates them by approximating the expected improvement (EI), which is computed as the ratio $\frac{l(\tau_1)}{g(\tau_1)}$. The value of $\tau_1$ with the highest EI is selected and the corresponding ELBO value is calculated. The new observation is then compared against the threshold and added to the existing dataset of y, subsequently updating $l(\tau_1)$ and $g(\tau_1)$. This process iterates until a predefined number of evaluations is reached. By iteratively learning and optimising the distributions, TPE ultimately returns the configuration that yields the minimum negative ELBO value. This result allows us to identify the optimal $\tau_1$.
 
 
+
 \section{Simulation study}
 \label{sec:simulation}
 
 \kl{We can add the VAR(2) and VMA(2) simulation study result. Is Appendix 1 the result with a fixed learning rate?} 
+
+\begin{figure}[h]
+  \includegraphics[width=\columnwidth]{sim_basis.pdf}
+  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for both VAR(2) and VMA1(1) models with different lengths.}
+  \label{sim_basis}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=\columnwidth]{sim_error_violins.pdf}
+  \caption{
+  Violin plots of 500  $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of both VAR(2) and VMA(1) models with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the SGVB method.}
+  \label{sim_error_violins}
+\end{figure}
+
+
 
 \section{Application to ET noise}
 \label{sec:application}
@@ -313,7 +332,8 @@ Gaussian noise colored with the design sensitivity of the
 xylophone configuration of the ET sampled at 2048 Hz which yields a time series of length 4,096,000. \KJ{For some reason my footnote is not showing and I cannot figure out why. Look into fixing.}\RM{revtex puts them into the bibliography} \footnote{Please note that the sensitivity curve used here is the previously called `ET-D' sensitivity curve. We choose tho use this curve rather than the slightly updated version presented in \cite{Branchesi:2023mws}, to compare more directly to previous work \cite{Janssens2023}. The small difference between PSD curves will have no impact on the key conclusions of the applicability of the work presented in this paper.}~\cite{Hild_2009,Hild:2010id}. In the rest of the
 paper we refer to this colored Gaussian noise as `ET noise' %\RM{What is the psd formula?} %\KJ{There is no straightforward formula. It is a complex combination from a handful key and another dozen smaller noise sources.}
 % Note that despite the fact that
-%we use identical noise, the X, Y and Z data are dierent
+%we use identical noise, the X, Y and Z data are di
+erent
 %Gaussian noise realisations.
 To simulate  non-identical correlated noise in the X, Y and Z channels, following \cite{Janssens2023}, we additionally injected another set of colored Gaussian noise, now with the shape of Gaussian peaks in the frequency domain. The Gaussian peaks are defined by the PSD
 \[ S_n^{\mathrm{GP}}(f)= \left( \frac{A}{\sqrt{2\pi}}\exp\left\{ 
@@ -341,75 +361,39 @@ Case 3: uncorrelated data - coherence = 0
   \end{itemize}
 \end{itemize}
 
-For Case 1, in order to optimise the number of basis functions in the SGVB method for the ET noise data with correlated noise among X, Y and Z channels, the effect of the number of basis functions on the maximum log Whittle likelihood is observed. The following plot illustrates the relationship between the number of basis functions and the corresponding maximised log Whittle likelihood values, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000:
-\begin{figure*}
+In order to optimize the number of basis functions in the SGVB method for three cases, the effect of the number of basis functions on the maximum log Whittle likelihood is observed. The following plot illustrates the relationship between the number of basis functions and the corresponding maximized log Whittle likelihood values. During the maximization process, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000, with the number of basis functions ranging from 100 to 700 in increments of 10：
+\begin{figure}
 \centering
-  \includegraphics[width=10cm]{num basis funs vs mls ET corr.png}
-  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for ET noise data with correlated noise.}
+  \includegraphics[width=10cm]{et_basis_fns.pdf}
+  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for three cases.}
   \label{et_corr_basis_funs_vs_mle}
-\end{figure*}
+\end{figure}
 
-Based on the Figure \ref {et_corr_basis_funs_vs_mle}, the optimal number of basis functions can be set to 450. Python function Hyperopt is used to optimise the learning rate $\tau_1$ to maximise the ELBO, the range is set from 0.002 to 0.02 and the maximum number of evaluations is set to 10. The following plots show the estimated power spectral densities and squared coherences for the ET noise data with correlated noise among three channels given the optimised learning rate and the corresponding parameters under the maximised ELBO.
-\begin{figure*}
+Based on the Figure ~\ref {et_corr_basis_funs_vs_mle}, the optimal number of basis functions for three cases can be set to 450. Python function Hyperopt is used to optimise the learning rate $\tau_1$ to maximise the ELBO, the range is set from 0.002 to 0.02 and the maximum number of evaluations is set to 10. The following plots (Figures \ref{fig:test} and \ref{caseAB_coh}) show the estimated power spectral densities and the squared coherences for three cases given the optimised learning rate and the corresponding parameters under the maximised ELBO.
+\begin{figure*}[htbp]
 \centering
-  \includegraphics[width=15cm]{ET corr noise psd.png}
+\begin{subfigure}{0.5\columwidth}
+  \centering
+  \includegraphics[width=\columwidth]{caseA_psd.pdf}
+  \caption{Case A PSD}
+  \label{fig:caseA_psd}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.5\columwidth}
+  \centering
+  \includegraphics[width=\columwidth]{caseBC_psd.pdf}
+  \caption{Case B and C PSD}
+  \label{fig:caseBC_psd}
+\end{subfigure}
+\caption{Spectral density estimates for three cases of ET noise data. Estimates are shown for VI (SGVB, green with 90\% CI) and periodogram (grey).}
+\label{fig:test}
 \end{figure*}
 
-\begin{figure*}
-\centering
-  \includegraphics[width=15cm]{ET corr noise coh.png}
-  \caption{Spectral density estimates (top) and squared coherence (bottom) for ET noise data with correlated noise. Estimates are shown for VI (SGVB, green with 90\% CI) and periodogram (grey).}
-\end{figure*}
-
-For Case 2, the following plot illustrates the relationship between the number of basis functions and the corresponding maximised log Whittle likelihood values for ET noise data with uncorrelated noise among three channels, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000:
-\begin{figure*}
-\centering
-  \includegraphics[width=10cm]{num basis funs vs mls ET uncorr.png}
-  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for ET noise data with uncorrelated noise.}
-  \label{et_uncorr_basis_funs_vs_mle}
-\end{figure*}
-
-Based on the Figure \ref {et_uncorr_basis_funs_vs_mle}, the optimal number of basis functions can also be set to 450. Python function Hyperopt is used to optimise the learning rate $\tau_1$ to maximise the ELBO. The following plots show the estimated power spectral densities and squared coherences for the ET noise data with uncorrelated noise among three channels given the optimised learning rate and the corresponding parameters under the maximised ELBO.
-\begin{figure*}
-\centering
-  \includegraphics[width=15cm]{ET uncorr noise psd.png}
-\end{figure*}
-
-\begin{figure*}
-\centering
-  \includegraphics[width=15cm]{ET uncorr noise coh.png}
-  \caption{Spectral density estimates (top) and squared coherence (bottom) for ET noise data with uncorrelated noise. Estimates are shown for VI (SGVB, green with 90\% CI) and periodogram (grey).}
-\end{figure*}
-
-The off-diagonal subplots represent the real and imaginary part of the estimated spectral densities, but small fluctuations can still be observed. It is also important to test whether the off-diagonal elements of the estimated spectral densities are zero for the ET noise data with uncorrelated noise among three channels by setting the cross spectrum to zero.
-For Case 3, the following plot illustrates the relationship between the number of basis functions and the corresponding maximised log Whittle likelihood values with zero cross spectrum for ET noise data with uncorrelated noise among three channels, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000:
-\begin{figure*}
-\centering
-  \includegraphics[width=10cm]{num basis funs vs mls ET uncorr no cross.png}
-  \caption{The relationship between the number of basis functions and the maximum likelihood estimate without considering cross spectrum for ET noise data with uncorrelated noise.}
-  \label{et_uncorr_no_cross_basis_funs_vs_mle}
-\end{figure*}
-
-Based on the Figure \ref {et_uncorr_no_cross_basis_funs_vs_mle}, the optimal number of basis functions can also be set to 450. Python function Hyperopt is used to optimise the learning rate $\tau_1$ to maximise the ELBO. The following plots show the estimated power spectral densities and squared coherences without considering cross spectrum for the ET noise data with uncorrelated noise among three channels given the optimised learning rate and the corresponding parameters under the maximised ELBO.
-\begin{figure*}
-\centering
-  \includegraphics[width=15cm]{ET uncorr noise no cross psd.png}
-\end{figure*}
-
-\begin{figure*}
-\centering
-  \includegraphics[width=15cm]{ET uncorr noise no cross coh.png}
-  \caption{Spectral density estimates (top) and squared coherence (bottom) without considering cross spectrum for ET noise data with uncorrelated noise. Estimates are shown for VI (SGVB, green with 90\% CI) and periodogram (grey).}
-\end{figure*}
-
-
-
-
-
-
-
-
-
+\begin{figure}
+  \includegraphics[width=\columnwidth]{caseAB_coh.pdf}
+  \caption{Squared coherence estimates for differenct cases of ET noise data.}
+  \label{caseAB_coh}
+\end{figure}
 
 
 
@@ -447,7 +431,6 @@ In this case, the hyperparameter $b$ in the regularized horseshoe prior is modif
 $M$ is the number of basis functions. This choice allows the model to utilize a larger number of basis
 functions (up to 700). The increased flexibility enables the model to capture more complex patterns
 in the data. The step sizes are set to be 0.005 and 0.05, respectively for each phase.
-
 
 \section{Discussion}
 \begin{itemize}
@@ -507,79 +490,14 @@ The $L_2$ error is defined as:
 where $\Vert \cdot \Vert$ denotes the Frobenius norm, i.e., defined for a complex $p\times p$ matrix $\A$ by
 $\displaystyle \Vert \A\Vert= \sqrt{\sum_{i,j} |a_{ij}|^2}$.
 
-In order to avoid underfitting in SGVB, we use the approach described in Section \ref{subsec:number} to determine an appropriate number of basis functions for different length of the two time series models. The number of basis functions ranges from 1 to 70. For each value in this range, we calculate the MLE using the gradient ascent method, with a learning rate of 0.002 and 10,000 iterations, by observing the effect of the number of basis functions on the maximum likelihood estimate, we select an appropriate number of basis functions. The following plots (Figures \ref{var2 basis funs vs mle} and \ref{vma1 basis funs vs mle}) illustrate the relationship between the number of basis functions and the corresponding MLE for the VAR(2) and VMA(1) models. The plots, from top to bottom, show results for three different lengths: $n=256$, $n=512$ and $n=1024$.
-\begin{figure*}
-\centering
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle var2 256.png}
-\end{subfigure}
-
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle var2 512.png}
-\end{subfigure}
-
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle var2 1024.png}
-\end{subfigure}
-\caption{The relationship between the number of basis functions and the maximum likelihood estimate for VAR(2) models with different lengths. From top to bottom, the plots correspond to lengths of 256, 512, and 1024.}
-\label{var2 basis funs vs mle}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle vma1 256.png}
-\end{subfigure}
-
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle vma1 512.png}
-\end{subfigure}
-
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=10cm]{num basis funs vs mle vma1 1024.png}
-\end{subfigure}
-\caption{The relationship between the number of basis functions and the maximum likelihood estimate for VMA(1) models with different lengths. From top to bottom, the plots correspond to lengths of 256, 512, and 1024.}
-\label{vma1 basis funs vs mle}
-\end{figure*}
+In order to avoid underfitting in SGVB, we use the approach described in Section \ref{subsec:number} to determine an appropriate number of basis functions for different length of the two time series models. The number of basis functions ranges from 1 to 70. For each value in this range, we calculate the MLE using the gradient ascent method, with a learning rate of 0.002 and 10,000 iterations, by observing the effect of the number of basis functions on the maximum likelihood estimate, we select an appropriate number of basis functions. The plot (Figure \ref{sim_basis}) illustrates the relationship between the number of basis functions and the corresponding MLE for both VAR(2) and VMA(1) models with three different lengths: $n=256$, $n=512$ and $n=1024$.
 
 
-Based on the Figures \ref{var2 basis funs vs mle} and \ref{vma1 basis funs vs mle}, for each length of the two models, the number of basis functions can be fixed at 30. The following violin plots (Figures \ref{l2 var2} and \ref{l2 vma1}) show the  $L_2$ errors over the 500 realizations for each method, model, and sample size. For the SGVB method, the Python package Hyperopt is used to optimise the $\tau_1$, the range is from 0.002 to 0.02 and the number of evaluations is 10, $\tau_2$ is set to 0.05.
-The parameters of the VNPC method and the number of iterations of MCMC are kept the same with \cite{LiuYixuan2024Ancl}  when conducting the same experiment. 
-\begin{figure*}
-\centering
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=18cm]{L2 errors var2.png}
-\end{subfigure}
+Based on the Figure \ref{sim_basis}, for each length of the two models, the number of basis functions can be fixed at 30. The violin plots (Figure \ref{sim_error_violins}) show the $L_2$ errors over the 500 realizations for each method, model, and sample size. For the SGVB method, the Python package Hyperopt is used to optimise the $\tau_1$, the range is from 0.002 to 0.02 and the number of evaluations is 10, $\tau_2$ is set to 0.05.
+The parameters of the VNPC method and the number of iterations of MCMC are kept the same with \cite{LiuYixuan2024Ancl}  when conducting the same experiment.
 
-\caption{
-\avi{Lets use violin plots for this instead of box plots}
-Violin plots of 500  $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of the VAR(2) model with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the SGVB method.}
-\label{l2 var2}
-\end{figure*}
 
-%\begin{figure*}
-%\centering
-%\includegraphics[width=18cm]{PYR Jianan/L1 Errors for VNPC and VI Methods %for VMA(1) model.png}
-%\end{figure*}
-
-\begin{figure*}
-\begin{subfigure}{\textwidth} % Use \textwidth to fit the width of the text area
-  \centering
-  \includegraphics[width=18cm]{L2 errors vma1.png}
-\end{subfigure}
-
-\caption{Violin plots of 500 $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of  the VMA(1) model with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the  SGVB method.}
-\label{l2 vma1}
-\end{figure*}
-
-The following two tables present the average  $L_2$ errors, empirical coverage and median width of pointwise 90\% credible regions as well as the average computation time per realization (in seconds), for the 500 realizations of both models using the VNPC and SGVB methods. \hyperref[table l1l2 var2]{Table 1} gives the results for  the VAR(2) model, while the \hyperref[table l1l2 vma1]{Table 2} displays those for  the VMA(1) model.
+The following two tables present the average  $L_2$ errors, empirical coverage and median width of pointwise 90\% credible regions as well as the average computation time per realization (in seconds), for the 500 realizations of both models with different lengths using the VNPC and SGVB methods. \hyperref[table l1l2 var2]{Table 1} gives the results for  the VAR(2) model, while the \hyperref[table l1l2 vma1]{Table 2} displays those for  the VMA(1) model.
 
 
 \begingroup
@@ -636,7 +554,7 @@ credible regions along with the average computation time (in seconds), for 500 r
 From the tabular comparison above, SGVB generates a narrower confidence interval than VNPC. This phenomenon can be attributed to the tendency of variational inference methods to underestimate the marginal variances of the target distribution during the optimization process. This process is equivalent to minimising $KL(q||p)$, where $q$ is the surrogate distribution and $p$ is the target posterior distribution. During this optimization, when $q$ assigns more probability mass to regions where $p$ has less probability mass, the KL divergence becomes very large. To avoid this, the optimization process leads the surrogate distribution to focus on high probability regions of the true posterior \cite{Blei2017}. SGVB is a method developed based on mean-field variational inference, and assumes that the posterior distribution can be decomposed into independent factors. However, in practice, parameters are often correlated, especially in complex models. This assumption leads to ignoring the correlations between parameters, resulting in an underestimation of overall uncertainty \cite{Blei2006}. Furthermore, the compactness property of SGVB constrains $q$ to a fixed-shape distribution family (multivariate Gaussian distribution). The optimization process can only adjust the mean and covariance of this distribution but cannot alter its fundamental shape. This limitation may lead to underestimation of probability mass in certain regions of the true posterior, thus underestimating the overall uncertainty \cite{Turner2011}. \cite{Wang2005} provided that the covariance matrix obtained by the variational Bayesian method differs from the inverse of the Fisher information matrix by a nonnegative definite matrix. This result demonstrates that the covariance matrix obtained by the variational Bayesian method is typically smaller, implying that credible interval estimations based on the variational Bayesian method are usually narrower than those based on the true posterior distribution.
 
 
-When comparing the SGVB to the VNPC method, their performance varies across different models and sample sizes. For the VMA(1) model, VNPC consistently demonstrates higher accuracy across all data lengths. However, in the VAR(2) model, SGVB shows comparable or slightly better performance for sample sizes $n=512$ and $n=1024$. As the sample size increases from $n=256$ to $n=1024$, both methods show a decrease in $L_2$ errors, indicating that with increasing sample size, the estimates converge towards the true PSD, this trend is visible in both models. Despite VNPC's generally higher accuracy, the SGVB method offers a significant advantage in terms of computational efficiency. This is because SGVB relies on numerical optimizations rather than MCMC simulations. In contrast, the computation time for the VNPC method increases significantly with sample size. Therefore, while VNPC is often more accurate but computationally costly, SGVB presents an attractive alternative, especially for larger datasets or when rapid computation is necessary.
+When comparing the SGVB towith the VNPC method, their performance varies acrossbetween different models and sample sizes. For the VMA(1) model, VNPC consistently demonstrates higher accuracy across all data lengths. However, in the VAR(2) model, SGVB shows comparable or slightly better performance for sample sizes $n=512$ and $n=1024$. As the sample size increases from $n=256$ to $n=1024$, both methods show a decrease in $L_2$ errors, indicating that with increasing sample size, the estimates converge towards the true PSD, this trend is visible in both models. Despite VNPC's generally higher accuracy, the SGVB method offers a significant advantage in terms of computational efficiency. This is because SGVB relies on numerical optimizations rather than MCMC simulations. In contrast, the computation time for the VNPC method increases significantly with sample size. Therefore, while VNPC is often more accurate but computationally costly, SGVB presents an attractive alternative, especially for larger datasets or when rapid computation is necessary.
 
 
 
@@ -644,6 +562,15 @@ When comparing the SGVB to the VNPC method, their performance varies across diff
 
 \section{Accuracy of the blocked  Whittle likelihood}
 \label{sec:accuracy}
+
+\begin{figure}[h]
+  \includegraphics[width=\columnwidth]{lnl_vs_nchunks.pdf}
+  \caption{.}
+  \label{lnl_vs_nchunks}
+\end{figure}
+
+
+
 
 
 
