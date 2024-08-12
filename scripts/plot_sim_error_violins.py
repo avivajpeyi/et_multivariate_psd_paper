@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import paths
-import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib import ticker
 
@@ -37,7 +36,7 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
     # Add legend
     if legend_labels:
         legend_patches = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(legend_labels)]
-        ax.legend(handles=legend_patches, fontsize='small', handletextpad=0.25, labelspacing=0.05, handlelength=1)
+        ax.legend(handles=legend_patches, fontsize='small', handletextpad=0.25, labelspacing=0.05, handlelength=1,loc=legend_loc)
 
     # Customize axes
     ax.set_xticks([1.25, 3.25, 5.25])
@@ -77,7 +76,7 @@ def load_timing_violin_data():
 def main():
     # First panel: Original violin plot
     colors = ['C0', 'C1'] * 3
-    legend_labels = ['VNPC', 'VB']
+    legend_labels = ['VNPC', 'SGVB']
 
     positions = [1, 1.5, 3, 3.5, 5, 5.5]
 
@@ -95,7 +94,7 @@ def main():
     axs[2].set_xlabel("Data Length")
     add_violin_plot(axs[0], violin_data1, positions, colors, legend_labels)
     add_violin_plot(axs[1], violin_data2, positions, colors)
-    add_violin_plot(axs[2], violin_data3, positions, ['C3', 'C4'] * 3, ['VAR', 'VMA'])
+    add_violin_plot(axs[2], violin_data3, positions, ['C3', 'C4'] * 3, ['VAR', 'VMA'], legend_loc='upper left')
     axs[2].set_ylabel(r'$\times$ Speed', labelpad=0.9)
     plt.subplots_adjust(hspace=0.)  # Adjust as needed
     plt.savefig(f"{paths.figures}/sim_error_violins.pdf", dpi=300)
