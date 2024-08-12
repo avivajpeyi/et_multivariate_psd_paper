@@ -42,7 +42,7 @@ def add_violin_plot(ax, data, positions, colors, legend_labels=None, legend_loc=
     # Customize axes
     ax.set_xticks([1.25, 3.25, 5.25])
     ax.set_xticklabels(['256', '512', '1024'])
-    ax.set_ylabel(r'$L_2$ error')
+    ax.set_ylabel(r'$L_2$')
     ax.xaxis.set_minor_locator(ticker.NullLocator())
     ax.yaxis.set_minor_locator(ticker.NullLocator())
 

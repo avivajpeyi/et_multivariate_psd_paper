@@ -38,7 +38,7 @@ def plot_et_matrix(
         spec_mat_upper = f['ETnoise_correlated_GP_spec_mat_upper_XYZ'][:]
         
     # upload the true psd data
-    file_path =f'{paths.data}/\ET(1).txt'
+    file_path =f'{paths.data}/ET(1).txt'
     ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
 
     file_path = f'{paths.data}/Peak10Hz_new.txt'

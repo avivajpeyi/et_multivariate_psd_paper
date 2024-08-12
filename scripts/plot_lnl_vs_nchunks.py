@@ -40,7 +40,7 @@ def main():
     secax.set_xticks(x)
     chunk_length_labels = [f'$2^{{{int(np.log2(length))}}}$' for length in chunk_lengths]
     secax.set_xticklabels(chunk_length_labels)
-    secax.set_xlabel('Chunk Length', fontsize=15)
+    secax.set_xlabel('Chunk Length')
 
     plt.grid(False)
     plt.tight_layout()

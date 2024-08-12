@@ -59,10 +59,14 @@ def main():
                  horizontalalignment='left')
 
     # remove verrical whitespaace beteweenn subplots
-    axes[1].set_xlabel('Frequency [Hz]', fontsize=LABEL_FS, labelpad=10)
+    axes[1].set_xlabel('Frequency [Hz]')
     plt.subplots_adjust(hspace=0., wspace=0.)
-    fig.text(0.04, 0.5, 'Squared Coherency', va='center', ha='center', rotation='vertical', fontsize=LABEL_FS)
-    plt.subplots_adjust(left=0.2)  # Adjust left margin to make room for the y-axis label
+    for ax in axes:
+        ax.set_ylabel(r'$C_{xy}$', labelpad=-10)
+    fig.align_ylabels(axes)
+
+    # fig.text(0.002, 0.5, r'$C^2_{xy}$', va='center', ha='center', rotation='vertical', fontsize=LABEL_FS)
+    # plt.subplots_adjust(left=0.2)  # Adjust left margin to make room for the y-axis label
     fig.savefig(f'{paths.figures}/caseAB_coh.pdf')
 
 
