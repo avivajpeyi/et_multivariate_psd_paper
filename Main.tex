@@ -8,6 +8,8 @@
 \usepackage{xcolor}
 \usepackage{braket}
 \usepackage{subcaption}
+\usepackage{pdfcomment}
+\usepackage{todonotes}
 \usepackage[nolist,nohyperlinks]{acronym}
 \usepackage{amsmath, amsthm, amssymb, amsbsy, mathtools, mathalpha}
 
@@ -24,6 +26,8 @@
 \usepackage{xcolor}
 %\usepackage[mathlines]{lineno}% Enable numbering of text and display math
 %\linenumbers\relax % Commence numbering lines
+
+
 
 \DeclareMathOperator{\argmax}{argmax} % no space, limits on side in displays
 \DeclareMathOperator{\argmin}{argmin} % no space, limits on side in displays
@@ -86,6 +90,7 @@ using variational inference
     \acro{VI}[VI]{variational inference}
     \acro{KL}[KL]{Kullback-Leibler}
     \acro{MCMC}[MCMC]{Markov chain Monte Carlo}
+    \acro{LVK}[LVK]{LIGO--VIRGO--KAGRA}
 \end{acronym}
 
 
@@ -109,7 +114,7 @@ Furthermore, the approach needs to be computationally efficient when applied to 
 
 % past work in tackling correlated noise.
 % Past work.....
-\avi{Talk about past work trying to tackle correlated noise.}
+\todo{Talk about past work trying to tackle correlated noise.}
 
 % what will this work do? 
 In this paper, we demonstrate a stochastic gradient \ac{VI} approach to estimate the multivariate \ac{PSD} for correlated \ac{ET} noise that has been developed by \cite{Hu2023}. 
@@ -117,7 +122,7 @@ In this paper, we demonstrate a stochastic gradient \ac{VI} approach to estimate
 VI transforms complex integration and posterior sampling tasks into a simpler optimisation challenge. With flexible surrogate model representations \cite{Blei2006,kingma2022}, the VI can approximate the posterior accurately with less demand in computation. In particular \citet{Vallisneri2024} demonstrated the normalizing flow in the VI framework for pulsar timing-array datasets. 
 
 Here we demonstrate the usefulness and flexibility of a VI approach for estimating the spectral density matrix of the correlated instrumental noise from a  network of gravitational wave detectors.
-In particular, we illustrate this using simulated ET noise but note that this approach is readily applicable to estimate  LISA instrumental noise or correlated LVK noise induced by magnetic noise/Schumann? resonances.
+In particular, we illustrate this using simulated ET noise but note that this approach is readily applicable to estimate  \ac{LISA} instrumental noise or correlated \ac{LVK} noise induced by magnetic noise/Schumann? resonances.
 To ease computational efforts of handling large time series, we introduce and utilise a blocked Whittle likelihood approximation rather than the traditional Whittle likelihood. We provide advice on choosing tuning parameters such as the learning rate and number of basis functions in the VI approach. Finally,
 as a by-product of this method, we also compute the coherence as a function of frequency, quantifying the degree of correlation between components of the multivariate time series. 
 
@@ -125,8 +130,10 @@ as a by-product of this method, we also compute the coherence as a function of f
 % Outline of paper
 The remainder of this letter is structured as follows. 
 Section~\ref{sec:method} defines the blocked Whittle likelihood and introduces the \ac{VI} method. 
-We validate the method using simulation studies and compare the \ac{PSD} estimates with traditional  \ac{MCMC} \ac{PSD} estimates in Section~\ref{sec:simulation}.
+We test the efficiency and accuracy of the SGVB approach using a simulation study in Section~\ref{sec:simulation}.
 Finally, Section~\ref{sec:application} presents the results of the method applied to simulated \ac{ET} datasets consisting of varying levels of correlated noise. 
+
+
 
 
 
@@ -159,6 +166,7 @@ Due to the normalizing and decorrelating properties of the Fourier transform, th
 \begin{equation}\label{eq:Whittle likelihood}
  \mathcal{L}(\d|\S) \propto \prod_{k=1}^{N} \det(\S(f_k))^{-1} \exp\left(-\frac{1}{n}\d(f_k)^* \S(f_k)^{-1} \d(f_k)\right)
 \end{equation}
+\todo{split eq into separate line to fit in 1-col}
 %\RM{not sure about the factor $1/(N\Delta_t)$?}
 where $\d^*(f_k)$ is the conjugate transpose of the $\d(f_k)$ and
  $\S(f_k)$ is a Hermitian positive semidefinite spectral density matrix at each $f_k$. Therefore, the unknown quantity here is $\S$, a matrix-valued function at each frequency with the additional restriction that its value at each frequency is Hermitian positive semidefinite. Note that when estimating the spectral density matrix, it is important that the estimate is again positive semidefinite at each $f_k$ so that the quadratic form in the exponent of the Whittle likelihood remains positive and thus defines a valid likelihood.
@@ -217,6 +225,7 @@ where
 \mathcal{L}_j(\d_j|\btheta_j,\bdelta_j) \propto \prod_{k=1}^{N} \delta_{jk}^{-2} \exp \left(-\frac{\left|d_j(f_k)-\sum_{l=1}^{j-1}\theta_{jl}^{(k)}d_l(f_k) \right|^2}{\delta_{jk}^2} \right)
 \label{eq:likelihoodj}
 \end{align}
+\todo{split eq into separate line to fit in 1-col}
 %
 where $d_j(f_k)$ denotes the Fourier coefficient of the $j$th channel and $\d_j=(d_j(f_1),\ldots,d_j(f_N))^T$.
 Then  $\log(\delta_{jk}^2)$ and the real and imaginary parts of $\theta_{jl}^{(k)}$ are modelled by Demmler-Reinsch basis functions in terms of $M$ truncated smoothing splines:
@@ -265,17 +274,15 @@ For our simulation study, the VI approach by \cite{Hu2023} was implemented in a 
 
 \medskip
 
-\subsection{Computational Efficiency} \label{subsec:simulationstudy}
-In Appendix \ref{sec:Simulation study}, we evaluate the performance of the SGVB approach in terms of accuracy and computational time in a simulation study. We simulate from bivariate stationary time series with known spectral densities (vector autoregressive and cector moving average time series) and compare the mean squared errors of the posterior spectral density estimates to that of the MCMC-based approach (VNPC) of \cite{LiuYixuan2024Ancl} which samples from the exact posterior distribution without a variational approximation. 
-To summarize, while the accuracy of SGVB is only slightly lower than that of VNPC, the computation time is reduced by a factor of about 200.
-This immense reduction in computation time was accomplished even without using the highly parallelized SGVB approach and the GPU capabilities of the code. Furthermore, the simulation study provides empirical evidence that the SGVB approach is consistent, i.e., with increasing sample size, the posterior distributions concentrate around the true spectral density. 
-For more details about the setup and results of the simulation study, we refer to  Appendix \ref{sec:Simulation study}.
 
-\subsection{Choice of the Number of Basis Functions} \label{subsec:number}
+
+\subsection{Choice of the Number of Basis Functions} \label{subsec:choice_of_nbasis}
 
 The variation of parameters ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(\theta^{(k)}_{j\cdot})$) over the frequency $f_k$ is represented by $M$ truncated smoothing splines. Setting $M$ too small or too large can lead to under- or over-fitting, respectively. If $M$ is too large, the dimension of $\phi_j$ increases, and the computational burden increases. One may be concerned with overfitting for a large $M$, however the horseshoe prior assigned to the coefficients provides a penalty that guards against over-fitting \citep{10.1214/17-EJS1337SI}.
 
-The likelihood (\ref{eq:likelihoodj}) measures the compatibility of data to the spectral density parameterized by ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(\theta^{(k)}_{j\cdot})$). As $M$ increases from a very small value, $\mathcal{L}(\d|\S)$ is expected to increase and does not change much when $M$ is sufficiently large. The maximum likelihood estimate (MLE) is relatively cheap to compute and we compare $\log \mathcal{L}(\d|\S)$ at the MLE for a range of values of $M$ and choose $M$ as the smallest value where $\mathcal{L}(\d|\S)$ does not increase significantly. In the application, we chose a conservative value of $M$ to avoid under-fitting. 
+The likelihood (\ref{eq:likelihoodj}) measures the compatibility of data to the spectral density parameterized by ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(\theta^{(k)}_{j\cdot})$). As $M$ increases from a very small value, $\mathcal{L}(\d|\S)$ is expected to increase and does not change much when $M$ is sufficiently large. 
+The maximum likelihood estimate (MLE) is relatively cheap to compute and we compare $\log \mathcal{L}(\d|\S)$ at the MLE for a range of values of $M$ and choose $M$ as the smallest value where $\mathcal{L}(\d|\S)$ does not increase significantly. 
+In the application, we chose a conservative value of $M$ to avoid under-fitting. 
  
 
 
@@ -305,11 +312,94 @@ Instead of searching for $\tau_1^*$ over a grid of potential values, we automate
 \section{Simulation study}
 \label{sec:simulation}
 
-\kl{We can add the VAR(2) and VMA(2) simulation study result. Is Appendix 1 the result with a fixed learning rate?} 
+\subsection{Accuracy of SGVB}
+
+% To summarize, while the accuracy of SGVB is only slightly lower than that of VNPC, the computation time is reduced by a factor of about 200.
+% % This immense reduction in computation time was accomplished even without using the highly parallelized SGVB approach and the GPU capabilities of the code. [I think we dont need to state this -- the reivewer might ask what the speed up is with GPU. And we can maybe demonstrate this in future work (using GPUs)] 
+% Furthermore, the simulation study provides empirical evidence that the SGVB approach is consistent, i.e., with increasing sample size, the posterior distributions concentrate around the true spectral density. 
+% For more details about the setup and results of the simulation study, we refer to  Appendix \ref{sec:Simulation study}.
+
+
+We simulate bivariate time series with known spectral densities and compare the mean squared errors of the posterior spectral density estimates to that of an MCMC-based approach (VNPC), introduced by \citet{LiuYixuan2024Ancl}, which samples from the exact posterior distribution without a variational approximation. 
+
+We generate 500 independent realisations of bivariate time series from a VAR(2) and VMA(1) models, using three  different sample sizes $n=256,512,1024$. 
+We estimate the spectral densities using both the VNPC method and SGVB method. 
+The performance of the two methods is evaluated by comparing their 
+$L_2$ errors~\citeme. 
+Refer to Appendix~\ref{appdx:simstudy} for more details.
+
+In order to avoid underfitting in SGVB, we use the approach described in Section~\ref{subsec:subsec:choice_of_nbasis} to determine an appropriate number of basis functions for different length of the two time series models. 
+Figure~\ref{sim_basis} shows the MLE obtained with the two methods, with a learning rate of 0.002 and 10,000 iterations, by observing the effect of the number of basis functions on the maximum likelihood estimate, we select an appropriate number of basis functions. The plot (Figure ) illustrates the relationship between the number of basis functions and the corresponding MLE for both VAR(2) and VMA(1) models with three different lengths: $n=256$, $n=512$ and $n=1024$.
+
+
+Based on the Figure \ref{sim_basis}, for each length of the two models, the number of basis functions can be fixed at 30. The violin plots (Figure \ref{sim_error_violins}) show the $L_2$ errors over the 500 realizations for each method, model, and sample size. For the SGVB method, the Python package Hyperopt is used to optimise the $\tau_1$, the range is from 0.002 to 0.02 and the number of evaluations is 10, $\tau_2$ is set to 0.05.
+The parameters of the VNPC method and the number of iterations of MCMC are kept the same with \cite{LiuYixuan2024Ancl}  when conducting the same experiment.
+
+
+The following two tables present the average  $L_2$ errors, empirical coverage and median width of pointwise 90\% credible regions as well as the average computation time per realization (in seconds), for the 500 realizations of both models with different lengths using the VNPC and SGVB methods. \hyperref[table l1l2 var2]{Table 1} gives the results for  the VAR(2) model, while the \hyperref[table l1l2 vma1]{Table 2} displays those for  the VMA(1) model.
+
+
+\begingroup
+\renewcommand{\arraystretch}{1.4} 
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccccc}
+\hline
+\multicolumn{7}{c}{VAR(2) model} \\
+\quad & \multicolumn{2}{c}{$n=256$}  & \multicolumn{2}{c}{$n = 512$}  & \multicolumn{2}{c}{$n = 1024$}\\
+\hline
+\quad & {VNPC} & {SGVB} & {VNPC} & {SGVB} & {VNPC} & {SGVB}\\
+%{$L_1$ error} & 0.098 & 0.133 & 0.078 & 0.073 & 0.061 & 0.049\\
+{$L_2$ error} & 0.129 & 0.121 & 0.103 & 0.091 & 0.082 & 0.066\\
+{Coverage} & 0.860 & 0.614 & 0.845 & 0.658 & 0.832 & 0.663\\
+{Width $f_{11}$} & 0.085 & 0.058 & 0.060 & 0.043 & 0.044 & 0.031\\
+{Width $\Re f_{12}$} & 0.091 & 0.056 & 0.067 & 0.042 & 0.050 & 0.031\\
+{Width $\Im f_{21}$} & 0.074 & 0.045 & 0.056 & 0.039 & 0.042 & 0.028\\
+{Width $f_{22}$} & 0.132 & 0.072 & 0.092 & 0.053 & 0.067& 0.036\\
+{Time} & 5573 & 297 & 9894 & 313 & 18657 & 357\\
+\hline
+\end{tabular}
+\caption{{\small Comparison of average  $L_2$ errors, empirical coverage and median width of pointwise 90\%
+credible regions along with the average computation time (in seconds), for 500 realizations using VNPC and SGVB methods across different sample sizes ($n=256$, $512$, and $1024$) for the VAR(2) model.}}
+\label{table l1l2 var2} 
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccccc}
+\hline
+\multicolumn{7}{c}{VMA(1) model}\\
+\quad & \multicolumn{2}{c}{$n=256$}  & \multicolumn{2}{c}{$n = 512$}  & \multicolumn{2}{c}{$n = 1024$}\\
+\hline
+\quad & {VNPC} & {SGVB} & {VNPC} & {SGVB} & {VNPC} & {SGVB}\\
+%{$L_1$ error} & 0.081 & 0.141 & 0.059 & 0.092 & 0.048 & 0.059\\
+{$L_2$ error} & 0.101 & 0.138 & 0.075 & 0.106 & 0.061 & 0.069\\
+{Coverage} & 0.905 & 0.638 & 0.893 & 0.620 & 0.840 & 0.662\\
+{Width $f_{11}$} & 0.118 & 0.086 & 0.081 & 0.070 & 0.058 & 0.053\\
+{Width $\Re f_{12}$} & 0.077 & 0.062 & 0.054 & 0.042 & 0.038 & 0.029\\
+{Width $\Im f_{21}$} & 0.063 & 0.044 & 0.041 & 0.032 & 0.029 & 0.026\\
+{Width $f_{22}$} & 0.173 & 0.180 & 0.122 & 0.126 & 0.084 & 0.097\\
+{Time} & 4342 & 188 & 7044 & 202 & 12802 & 231\\
+\hline
+\end{tabular}
+\caption{{\small Comparison of average $L_2$ errors, empirical coverage and median width of pointwise 90\%
+credible regions along with the average computation time (in seconds), for 500 realizations using VNPC and SGVB methods across different sample sizes ($n=256$, $512$, and $1024$) for the VMA(1) model.}}
+\label{table l1l2 vma1} 
+\end{table}
+\RM{Do we need the 3 digits of fractional seconds for Time or should we round to seconds?}
+\endgroup
+
+From the tabular comparison above, SGVB generates a narrower confidence interval than VNPC. This phenomenon can be attributed to the tendency of variational inference methods to underestimate the marginal variances of the target distribution during the optimization process. This process is equivalent to minimising $KL(q||p)$, where $q$ is the surrogate distribution and $p$ is the target posterior distribution. During this optimization, when $q$ assigns more probability mass to regions where $p$ has less probability mass, the KL divergence becomes very large. To avoid this, the optimization process leads the surrogate distribution to focus on high probability regions of the true posterior \cite{Blei2017}. SGVB is a method developed based on mean-field variational inference, and assumes that the posterior distribution can be decomposed into independent factors. However, in practice, parameters are often correlated, especially in complex models. This assumption leads to ignoring the correlations between parameters, resulting in an underestimation of overall uncertainty \cite{Blei2006}. Furthermore, the compactness property of SGVB constrains $q$ to a fixed-shape distribution family (multivariate Gaussian distribution). The optimization process can only adjust the mean and covariance of this distribution but cannot alter its fundamental shape. This limitation may lead to underestimation of probability mass in certain regions of the true posterior, thus underestimating the overall uncertainty \cite{Turner2011}. \cite{Wang2005} provided that the covariance matrix obtained by the variational Bayesian method differs from the inverse of the Fisher information matrix by a nonnegative definite matrix. This result demonstrates that the covariance matrix obtained by the variational Bayesian method is typically smaller, implying that credible interval estimations based on the variational Bayesian method are usually narrower than those based on the true posterior distribution.
+
+
+When comparing the SGVB towith the VNPC method, their performance varies acrossbetween different models and sample sizes. For the VMA(1) model, VNPC consistently demonstrates higher accuracy across all data lengths. However, in the VAR(2) model, SGVB shows comparable or slightly better performance for sample sizes $n=512$ and $n=1024$. As the sample size increases from $n=256$ to $1024$, both methods show a decrease in $L_2$ errors, indicating that with increasing sample size, the estimates converge towards the true PSD, this trend is visible in both models. Despite VNPC's generally higher accuracy, the SGVB method offers a significant advantage in terms of computational efficiency. This is because SGVB relies on numerical optimizations rather than MCMC simulations. In contrast, the computation time for the VNPC method increases significantly with sample size. Therefore, while VNPC is often more accurate but computationally costly, SGVB presents an attractive alternative, especially for larger datasets or when rapid computation is necessary.
+
+
 
 \begin{figure}[h]
   \includegraphics[width=\columnwidth]{sim_basis.pdf}
-  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for both VAR(2) and VMA1(1) models with different lengths.}
+  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for both VAR(2) and VMA1(1) models with different lengths. \avi{remake plot using $L_2$ instead of $L2$. Also speciofy the difference between a) and b) }}
   \label{sim_basis}
 \end{figure}
 
@@ -320,6 +410,17 @@ Instead of searching for $\tau_1^*$ over a grid of potential values, we automate
   Violin plots of 500  $L_2$ errors obtained from applying the VNPC and SGVB methods to 500 realizations of both VAR(2) and VMA(1) models with different sample sizes ($n = 256, 512, 1024$). The blue boxes represent the errors computed by the VNPC method, while the green boxes represent those obtained using the SGVB method.}
   \label{sim_error_violins}
 \end{figure}
+
+
+
+\subsection{Accuracy of binned Likelihood}
+
+\begin{figure}[h]
+  \includegraphics[width=\columnwidth]{lnl_vs_nchunks}
+  \caption{Accuracy of the blocked  Whittle likelihood}
+  \label{lnl_vs_nchunks}
+\end{figure}
+
 
 
 
@@ -361,27 +462,27 @@ Case 3: uncorrelated data - coherence = 0
   \end{itemize}
 \end{itemize}
 
-In order to optimize the number of basis functions in the SGVB method for three cases, the effect of the number of basis functions on the maximum log Whittle likelihood is observed. The following plot illustrates the relationship between the number of basis functions and the corresponding maximized log Whittle likelihood values. During the maximization process, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000, with the number of basis functions ranging from 100 to 700 in increments of 10：
+In order to optimize the number of basis functions in the SGVB method for three cases, the effect of the number of basis functions on the maximum log Whittle likelihood is observed. The following plot illustrates the relationship between the number of basis functions and the corresponding maximized log Whittle likelihood values. During the maximization process, the learning rate for gradient ascent is set to 0.002, and the number of iterations is set to 10,000, with the number of basis functions ranging from 100 to 700 in increments of 10
 \begin{figure}
 \centering
-  \includegraphics[width=10cm]{et_basis_fns.pdf}
-  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for three cases.}
+  \includegraphics[width=\columnwidth]{et_basis_fns.pdf}
+  \caption{The relationship between the number of basis functions and the maximum likelihood estimate for three cases. \avi{Set xlim to be the first and last M}}
   \label{et_corr_basis_funs_vs_mle}
 \end{figure}
 
 Based on the Figure ~\ref {et_corr_basis_funs_vs_mle}, the optimal number of basis functions for three cases can be set to 450. Python function Hyperopt is used to optimise the learning rate $\tau_1$ to maximise the ELBO, the range is set from 0.002 to 0.02 and the maximum number of evaluations is set to 10. The following plots (Figures \ref{fig:test} and \ref{caseAB_coh}) show the estimated power spectral densities and the squared coherences for three cases given the optimised learning rate and the corresponding parameters under the maximised ELBO.
-\begin{figure*}[htbp]
+\begin{figure*}[h]
 \centering
-\begin{subfigure}{0.5\columwidth}
+\begin{subfigure}{\columnwidth}
   \centering
-  \includegraphics[width=\columwidth]{caseA_psd.pdf}
+  \includegraphics[width=1.05\columnwidth]{caseA_psd.pdf}
   \caption{Case A PSD}
   \label{fig:caseA_psd}
 \end{subfigure}
 \hfill
-\begin{subfigure}{0.5\columwidth}
+\begin{subfigure}{\columnwidth}
   \centering
-  \includegraphics[width=\columwidth]{caseBC_psd.pdf}
+  \includegraphics[width=1.05\columnwidth]{caseBC_psd.pdf}
   \caption{Case B and C PSD}
   \label{fig:caseBC_psd}
 \end{subfigure}
@@ -457,126 +558,26 @@ support.
 
 \appendix  
 
-\section{Simulation study} \label{sec:Simulation study}
-
-%\begin{itemize}
-%    \item one VI vs MCMC plot of result
-%    \item L1 L2 histogram of errors MCMC vs VI 
-%    \item violin plot of runtimes
-%    \item Chunked LnL -- LnL vs number of chunks
-%\end{itemize}
-
-In order to test the efficiency and accuracy of the SGVB approach, we perform a simulation study, generating from bivariate time series models with known spectral density and compare the performance with the nonparametric spectral density estimation method (VNPC) introduced by \cite{LiuYixuan2024Ancl} that puts a Bernstein-Matrix Gamma process prior on the spectral density matrix and  uses MCMC for posterior  computation. Bivariate time series are generated from a :
-VAR(2) model:
+\section{Simulation study details}
+\label{appdx:simstudy}
+The VAR(2) model is defined by
 \begin{align}
 Z_t = \begin{pmatrix}0.5 & 0 \\0 & -0.3\end{pmatrix}\underline{Z}_{t-1}+\begin{pmatrix}0 & 0 \\0 & -0.5\end{pmatrix}\underline{Z}_{t-2}+\underline{e}_t, %\quad \underline{e}_t\overset{iid}{\sim}N \left(\bm{0}, \begin{pmatrix}1 & 0.9 \\0.9 & 1\end{pmatrix} \right)
 \end{align}
- where $\underline{e}_t\overset{iid}{\sim}N \left(\bm{0}, \begin{pmatrix}1 & 0.9 \\0.9 & 1 \end{pmatrix}  \right) $ and a VMA(1) model:
+ where $\underline{e}_t\overset{iid}{\sim}N \left(\bm{0}, \begin{pmatrix}1 & 0.9 \\0.9 & 1 \end{pmatrix}  \right) $ and the VMA(1) is given by
 \begin{align}
-\underline{Z}_t =\underline{e}_t+\begin{pmatrix}-0.75 & 0.5 \\0.5 & 0.75\end{pmatrix}\underline{e}_{t-1}, \quad \underline{e}_t\overset{iid}{\sim}N \left(\bm{0}, \begin{pmatrix}1 & 0.5 \\0.5 & 1\end{pmatrix}\right)
+\underline{Z}_t =\underline{e}_t+\begin{pmatrix}-0.75 & 0.5 \\0.5 & 0.75\end{pmatrix}\underline{e}_{t-1}, \quad \underline{e}_t\overset{iid}{\sim}N \left(\bm{0}, \begin{pmatrix}1 & 0.5 \\0.5 & 1\end{pmatrix}\right)\ .
 \end{align}
-Three different sample sizes $n=256$, $n=512$ and $n=1024$ for each time series are considered. For each model and each sample size, we generate 500 independent realizations and estimate the spectral densities using both the VNPC method and SGVB method. The performance of the two methods is evaluated by comparing their 
-%$L_1$ and 
-$L_2$ errors. Let $\hat{\bm{f}}$ denotes the estimated spectral density matrix for one realization, and let $\bm{f}_0$ be the true spectral density matrix. 
-%The $L_1$ error for one realization are given by:
-%\begin{eqnarray*}
-%||\hat{\bm{f}}_0 - \bm{f}_0||_{L_1} &=& \int_{0}^{0.5} ||\hat{\bm{f}}_0(\nu) %- \bm{f}_0||_{L_1}(\nu)|| d\nu \\ & \approx& \frac{1}{N} %\sum_{k=1}^{N}||\hat{\bm{f}}_0(\nu_k)-\bm{f}_0(\nu_k)||
-%\end{eqnarray*}
-The $L_2$ error is defined as:
+
+
+Let $\hat{\bm{f}}$ denotes the estimated spectral density matrix for one realization, and let $\bm{f}_0$ be the true spectral density matrix. 
+The $L_2$ error is defined as
 \begin{eqnarray*}
 ||\hat{\bm{f}} - \bm{f}_0||_{L_2} &=& \left(\int_{0}^{0.5} ||\hat{\bm{f}}_0(\nu) - \bm{f}_0||^2 d\nu \right)^{\frac{1}{2}} \\
 &\approx &\left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\bm{f}}_0(\nu_k)-\bm{f}_0(\nu_k)||^2 \right)^{\frac{1}{2}}
 \end{eqnarray*}
 where $\Vert \cdot \Vert$ denotes the Frobenius norm, i.e., defined for a complex $p\times p$ matrix $\A$ by
 $\displaystyle \Vert \A\Vert= \sqrt{\sum_{i,j} |a_{ij}|^2}$.
-
-In order to avoid underfitting in SGVB, we use the approach described in Section \ref{subsec:number} to determine an appropriate number of basis functions for different length of the two time series models. The number of basis functions ranges from 1 to 70. For each value in this range, we calculate the MLE using the gradient ascent method, with a learning rate of 0.002 and 10,000 iterations, by observing the effect of the number of basis functions on the maximum likelihood estimate, we select an appropriate number of basis functions. The plot (Figure \ref{sim_basis}) illustrates the relationship between the number of basis functions and the corresponding MLE for both VAR(2) and VMA(1) models with three different lengths: $n=256$, $n=512$ and $n=1024$.
-
-
-Based on the Figure \ref{sim_basis}, for each length of the two models, the number of basis functions can be fixed at 30. The violin plots (Figure \ref{sim_error_violins}) show the $L_2$ errors over the 500 realizations for each method, model, and sample size. For the SGVB method, the Python package Hyperopt is used to optimise the $\tau_1$, the range is from 0.002 to 0.02 and the number of evaluations is 10, $\tau_2$ is set to 0.05.
-The parameters of the VNPC method and the number of iterations of MCMC are kept the same with \cite{LiuYixuan2024Ancl}  when conducting the same experiment.
-
-
-The following two tables present the average  $L_2$ errors, empirical coverage and median width of pointwise 90\% credible regions as well as the average computation time per realization (in seconds), for the 500 realizations of both models with different lengths using the VNPC and SGVB methods. \hyperref[table l1l2 var2]{Table 1} gives the results for  the VAR(2) model, while the \hyperref[table l1l2 vma1]{Table 2} displays those for  the VMA(1) model.
-
-
-\begingroup
-\renewcommand{\arraystretch}{1.4} 
-\begin{table}[h]
-\centering
-\begin{tabular}{ccccccc}
-\hline
-\multicolumn{7}{c}{VAR(2) model} \\
-\quad & \multicolumn{2}{c}{$n=256$}  & \multicolumn{2}{c}{$n = 512$}  & \multicolumn{2}{c}{$n = 1024$}\\
-\hline
-\quad & {VNPC} & {SGVB} & {VNPC} & {SGVB} & {VNPC} & {SGVB}\\
-%{$L_1$ error} & 0.098 & 0.133 & 0.078 & 0.073 & 0.061 & 0.049\\
-{$L_2$ error} & 0.129 & 0.121 & 0.103 & 0.091 & 0.082 & 0.066\\
-{Coverage} & 0.860 & 0.614 & 0.845 & 0.658 & 0.832 & 0.663\\
-{Width $f_{11}$} & 0.085 & 0.058 & 0.060 & 0.043 & 0.044 & 0.031\\
-{Width $\Re f_{12}$} & 0.091 & 0.056 & 0.067 & 0.042 & 0.050 & 0.031\\
-{Width $\Im f_{21}$} & 0.074 & 0.045 & 0.056 & 0.039 & 0.042 & 0.028\\
-{Width $f_{22}$} & 0.132 & 0.072 & 0.092 & 0.053 & 0.067& 0.036\\
-{Time} & 5573 & 297 & 9894 & 313 & 18657 & 357\\
-\hline
-\end{tabular}
-\caption{{\small Comparison of average  $L_2$ errors, empirical coverage and median width of pointwise 90\%
-credible regions along with the average computation time (in seconds), for 500 realizations using VNPC and SGVB methods across different sample sizes ($n=256$, $512$, and $1024$) for the VAR(2) model.}}
-\label{table l1l2 var2} 
-\end{table}
-
-
-\begin{table}[h]
-\centering
-\begin{tabular}{ccccccc}
-\hline
-\multicolumn{7}{c}{VMA(1) model}\\
-\quad & \multicolumn{2}{c}{$n=256$}  & \multicolumn{2}{c}{$n = 512$}  & \multicolumn{2}{c}{$n = 1024$}\\
-\hline
-\quad & {VNPC} & {SGVB} & {VNPC} & {SGVB} & {VNPC} & {SGVB}\\
-%{$L_1$ error} & 0.081 & 0.141 & 0.059 & 0.092 & 0.048 & 0.059\\
-{$L_2$ error} & 0.101 & 0.138 & 0.075 & 0.106 & 0.061 & 0.069\\
-{Coverage} & 0.905 & 0.638 & 0.893 & 0.620 & 0.840 & 0.662\\
-{Width $f_{11}$} & 0.118 & 0.086 & 0.081 & 0.070 & 0.058 & 0.053\\
-{Width $\Re f_{12}$} & 0.077 & 0.062 & 0.054 & 0.042 & 0.038 & 0.029\\
-{Width $\Im f_{21}$} & 0.063 & 0.044 & 0.041 & 0.032 & 0.029 & 0.026\\
-{Width $f_{22}$} & 0.173 & 0.180 & 0.122 & 0.126 & 0.084 & 0.097\\
-{Time} & 4342 & 188 & 7044 & 202 & 12802 & 231\\
-\hline
-\end{tabular}
-\caption{{\small Comparison of average $L_2$ errors, empirical coverage and median width of pointwise 90\%
-credible regions along with the average computation time (in seconds), for 500 realizations using VNPC and SGVB methods across different sample sizes ($n=256$, $512$, and $1024$) for the VMA(1) model.}}
-\label{table l1l2 vma1} 
-\end{table}
-\RM{Do we need the 3 digits of fractional seconds for Time or should we round to seconds?}
-\endgroup
-
-From the tabular comparison above, SGVB generates a narrower confidence interval than VNPC. This phenomenon can be attributed to the tendency of variational inference methods to underestimate the marginal variances of the target distribution during the optimization process. This process is equivalent to minimising $KL(q||p)$, where $q$ is the surrogate distribution and $p$ is the target posterior distribution. During this optimization, when $q$ assigns more probability mass to regions where $p$ has less probability mass, the KL divergence becomes very large. To avoid this, the optimization process leads the surrogate distribution to focus on high probability regions of the true posterior \cite{Blei2017}. SGVB is a method developed based on mean-field variational inference, and assumes that the posterior distribution can be decomposed into independent factors. However, in practice, parameters are often correlated, especially in complex models. This assumption leads to ignoring the correlations between parameters, resulting in an underestimation of overall uncertainty \cite{Blei2006}. Furthermore, the compactness property of SGVB constrains $q$ to a fixed-shape distribution family (multivariate Gaussian distribution). The optimization process can only adjust the mean and covariance of this distribution but cannot alter its fundamental shape. This limitation may lead to underestimation of probability mass in certain regions of the true posterior, thus underestimating the overall uncertainty \cite{Turner2011}. \cite{Wang2005} provided that the covariance matrix obtained by the variational Bayesian method differs from the inverse of the Fisher information matrix by a nonnegative definite matrix. This result demonstrates that the covariance matrix obtained by the variational Bayesian method is typically smaller, implying that credible interval estimations based on the variational Bayesian method are usually narrower than those based on the true posterior distribution.
-
-
-When comparing the SGVB towith the VNPC method, their performance varies acrossbetween different models and sample sizes. For the VMA(1) model, VNPC consistently demonstrates higher accuracy across all data lengths. However, in the VAR(2) model, SGVB shows comparable or slightly better performance for sample sizes $n=512$ and $n=1024$. As the sample size increases from $n=256$ to $n=1024$, both methods show a decrease in $L_2$ errors, indicating that with increasing sample size, the estimates converge towards the true PSD, this trend is visible in both models. Despite VNPC's generally higher accuracy, the SGVB method offers a significant advantage in terms of computational efficiency. This is because SGVB relies on numerical optimizations rather than MCMC simulations. In contrast, the computation time for the VNPC method increases significantly with sample size. Therefore, while VNPC is often more accurate but computationally costly, SGVB presents an attractive alternative, especially for larger datasets or when rapid computation is necessary.
-
-
-
-
-
-\section{Accuracy of the blocked  Whittle likelihood}
-\label{sec:accuracy}
-
-\begin{figure}[h]
-  \includegraphics[width=\columnwidth]{lnl_vs_nchunks.pdf}
-  \caption{.}
-  \label{lnl_vs_nchunks}
-\end{figure}
-
-
-
-
-
-
-
-
-
 
 
 
