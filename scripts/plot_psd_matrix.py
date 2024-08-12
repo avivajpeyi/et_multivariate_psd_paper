@@ -50,9 +50,9 @@ def plot_et_matrix(
     file_path = f'{paths.data}/Peak90Hz_new.txt'
     Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
 
-    x_channel_real = ((ET_1[:,1] + Peak10Hz[:,1] + Peak50Hz[:,1])**2)/2
-    y_channel_real = ((ET_1[:,1] + Peak10Hz[:,1] + Peak90Hz[:,1])**2)/2
-    z_channel_real = ((ET_1[:,1] + Peak50Hz[:,1] + Peak90Hz[:,1])**2)/2
+    x_channel_real = ((ET_1[:,1]**2 + Peak10Hz[:,1]**2 + Peak50Hz[:,1]**2))/2
+    y_channel_real = ((ET_1[:,1]**2 + Peak10Hz[:,1]**2 + Peak90Hz[:,1]**2))/2
+    z_channel_real = ((ET_1[:,1]**2 + Peak50Hz[:,1]**2 + Peak90Hz[:,1]**2))/2
 
     q = 10 ** 22 / 1.0
     time_interval = 2000
