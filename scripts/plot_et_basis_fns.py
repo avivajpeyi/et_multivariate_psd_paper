@@ -20,8 +20,9 @@ def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     max_lnl_sorted = max_lnl[sorted_indices]
 
     ax.plot(number_basis_sorted, max_lnl_sorted, label=label, **kwgs)
-    ax.set_xlabel(r'$M$', fontsize=15)
-    ax.set_ylabel(r'Maximized $\log \mathcal{L}(d|\theta)$', fontsize=15)
+    ax.set_xlabel(r'$M$')
+    ax.set_ylabel(r'Maximized $\log \mathcal{L}(\bf{d}|\bf{S})$')
+    ax.set_xlim(min(number_basis), max(number_basis))
 
 
 
