@@ -34,10 +34,10 @@ def main():
         Line2D([0], [0], color='C2', lw=2, label='n=1024'),
         Line2D([0], [0], color='k', lw=2, label='VAR'),
         Line2D([0], [0], color='k', lw=2, label='VMA', ls='dotted'),
-    ], loc='lower right', ncols=2, labelspacing=0.05, columnspacing=0.25, handlelength=1)
+    ], loc='lower right', ncol=2, labelspacing=0.05, columnspacing=0.25, handlelength=1)
     # bbox_to_anchor=(1.02, 1), borderaxespad=0)
     ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Normalised $\log \mathcal{L}(\bf{d}|\bf{S})$')
+    ax.set_ylabel(r'Normalised MLE')
     plt.xlim(min(X), max(X))
     fig.savefig(f'{paths.figures}/sim_basis.pdf', bbox_inches='tight')
 

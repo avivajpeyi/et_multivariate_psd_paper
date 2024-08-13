@@ -2,10 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import paths
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import paths
 
 def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     # Load data from CSV
@@ -19,9 +15,11 @@ def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     number_basis_sorted = number_basis[sorted_indices]
     max_lnl_sorted = max_lnl[sorted_indices]
 
-    ax.plot(number_basis_sorted, max_lnl_sorted, label=label, **kwgs)
+    # Normalize the max_lnl_sorted
+    max_lnl_normalized = max_lnl_sorted - max_lnl_sorted.max()
+    ax.plot(number_basis_sorted, max_lnl_normalized, label=label, **kwgs)
     ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Maximized $\log \mathcal{L}(\bf{d}|\bf{S})$')
+    ax.set_ylabel(r'Normalised MLE')
     ax.set_xlim(min(number_basis), max(number_basis))
 
 
@@ -32,8 +30,8 @@ def main():
         "ET_uncorr_lr_low_basis_vs_lnl_combined_results.csv",
     ]
     labels = [
-        "Case 1",
-        "Case 2 & 3",
+        "Case A",
+        "Case B & C",
     ]
     kwgs = [
     dict(color="C0", ls="-", lw=2),
