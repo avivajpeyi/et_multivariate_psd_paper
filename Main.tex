@@ -4,7 +4,7 @@
  aps,
  nofootinbib,
 ]{revtex4-2}
-
+\usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{braket}
@@ -381,6 +381,7 @@ We conduct three analyses:
     \item Analysis on ET noise (no correlated noise), 
     \item Analysis on ET noise (no correlated noise) assuming there are no-cross diagonal elements of the multivariate PSD \avi{We need to reword this..}
 \end{enumerate}
+\todo{the 'case' is going into the margin}
 
 The dataset of each case of the ET noise can be considered as a three dimensional Gaussian stationary multivariate time series of length 4,096K. 
 To handle such a large data set, in this application, the whole dataset is evenly divided into 125 segments each of length 32,738.
