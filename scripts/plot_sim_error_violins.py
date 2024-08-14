@@ -91,7 +91,7 @@ def main():
     axs[0].text(0.02, 0.98, 'a)', transform=axs[0].transAxes, **kwgs)
     axs[1].text(0.02, 0.98, 'b)', transform=axs[1].transAxes, **kwgs)
     axs[2].text(0.02, 0.98, 'c)', transform=axs[2].transAxes, **kwgs)
-    axs[2].set_xlabel("Data Length")
+    axs[2].set_xlabel(r'$n$')
     add_violin_plot(axs[0], violin_data1, positions, colors, legend_labels)
     add_violin_plot(axs[1], violin_data2, positions, colors)
     add_violin_plot(axs[2], violin_data3, positions, ['C3', 'C4'] * 3, ['VAR', 'VMA'], legend_loc='upper left')
