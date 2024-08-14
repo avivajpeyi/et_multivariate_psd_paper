@@ -195,7 +195,7 @@ results = {
 }
 
 result_df = pd.DataFrame([results])
-csv_file = f'var2_256_errors{task_id}.csv'
+csv_file = f'vma1_256_errors{task_id}.csv'
 result_df.to_csv(csv_file, index=False)
 
 

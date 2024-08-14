@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import median_abs_deviation
 import time
 start_time = time.time()
-import modified_lr_ll_100_spec_vi_elbo
+import modified_lnl_specvi_ET
 import tensorflow as tf
 import tensorflow_probability as tfp
 tfd = tfp.distributions
@@ -41,7 +41,7 @@ N_theta = 450
 
 def objective(params):
     lr_map = params['lr_map']
-    Spec_m = modified_lr_ll_100_spec_vi_elbo.SpecVI(channels * q)  
+    Spec_m = modified_lnl_specvi_ET.SpecVI(channels * q)  
     result_list = Spec_m.runModel(N_delta=N_delta, N_theta=N_theta, lr_map=lr_map, ntrain_map=10000, 
                             sparse_op=False, nchunks = nchunks, time_interval = time_interval, required_part = required_part)    
     losses = result_list[0]
