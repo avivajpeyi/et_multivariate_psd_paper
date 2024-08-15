@@ -19,7 +19,7 @@ def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     max_lnl_normalized = max_lnl_sorted - max_lnl_sorted.max()
     ax.plot(number_basis_sorted, max_lnl_normalized, label=label, **kwgs)
     ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Normalised MLE')
+    ax.set_ylabel(r'Normalised log MLE')
     ax.set_xlim(min(number_basis), max(number_basis))
 
 

@@ -37,7 +37,7 @@ def main():
     ], loc='lower right', ncol=2, labelspacing=0.05, columnspacing=0.25, handlelength=1)
     # bbox_to_anchor=(1.02, 1), borderaxespad=0)
     ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Normalised MLE')
+    ax.set_ylabel(r'Normalised log MLE')
     plt.xlim(min(X), max(X))
     fig.savefig(f'{paths.figures}/sim_basis.pdf', bbox_inches='tight')
 
