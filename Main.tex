@@ -34,8 +34,8 @@
 
 
 
-% \DeclareMathOperator{\argmax}{argmax} % no space, limits on side in displays
-% \DeclareMathOperator{\argmin}{argmin} % no space, limits on side in displays
+\DeclareMathOperator{\argmax}{argmax} % no space, limits on side in displays
+\DeclareMathOperator{\argmin}{argmin} % no space, limits on side in displays
 
 
 \graphicspath{{figures/}}
@@ -73,7 +73,6 @@ using variational inference
 \begin{abstract}
  This paper presents a novel spectral density estimation method that applies to very long multivariate time series such as those encountered when analyzing data from a network of detectors such as the Einstein Telescope or LISA. The method introduces a blocked Whittle likelihood approximation for stationary time series and makes use of the Cholesky decomposition of the inverse spectral density matrix to obtain a positive definite spectral density estimator. A prior is placed on the spline coefficients of each Cholesky factor and a stochastic gradient variational Bayes approach is used to compute the posterior distribution. We illustrate the method using x seconds of simulated correlated ET noise.\ldots
  %We illustrate this technique for ET noise characterisation and simultaneous extraction of a binary merger signal.  For computational feasibility we approximate the posterior distribution the variational Bayesian method, minimizing the KL divergence with the variational distribution. As the result, we can estimate the spectral density quite accurately and quickly. 
- \avi{finish abstract}
 \end{abstract}
 
 %\keywords{Suggested keywords}%Use showkeys class option if keyword
@@ -103,15 +102,6 @@ using variational inference
 
 \section{Introduction}
 
-\avi{Main TODO
-\begin{itemize}
-    \item make eq flow with text
-    \item in general, text around eq needs work
-    \item keep variables consistent (eg $d^*($ vs $d()^*$)
-\end{itemize}
-
-}
-
 The next-generation \ac{GW} detectors, e.g. \ac{ET}~\cite{Punturo_2010}, \ac{CE}~\cite{CE_horizon_study}, and \ac{LISA}~\cite{LISA_science_case}, will usher in a transformative era of \ac{GW} astronomy. 
 The increased sensitivity to \ac{GW} will lead to a much higher \ac{GW} detection rate, improving our understanding of cosmic phenomena, ranging from the dynamics of black hole mergers to the nature of the early universe~\cite{ET_science_case, Maggiore_2020_ET_science_case, Branchesi_2023_ET_science_case, CE_horizon_study, LISA_science_case}.
 
@@ -119,8 +109,8 @@ Despite their advanced capabilities, these detectors face new challenges, partic
 \ac{ET} and \ac{LISA}, which consist of co-located interferometers, may experience correlated noise in their data streams~\cite{Janssens2023}. 
 For \ac{ET}, this correlated noise can stem from seismic, Newtonian, and magnetic sources~\cite{Ball_lightning_strokes, Janssens_newtonian_seismic, Janssens_magnetic_noise}, while \ac{LISA}  may encounter noise from temperature variations and micro-thrusters~\cite{lisa_temp_noise,lisa_thrusters_noise}. 
 
-Ignoring correlated noise in analyses of \ac{GW} can lead to biased parameter estimates and incorrect astrophysical conclusions (e.g., in analysing the stochastic \ac{GW} background~\cite{Thrane_correlations_SGWB, Christensen_2019_SGWB, boileau2022figures} and transient signals from events like binary black hole mergers~\cite{Cireddu:2023:arXiv}). 
-Although recent studies have proposed methods for handling correlated noise and estimating spectral densities, a flexible Bayesian approach for matrix-valued spectral density estimation is needed~\cite{Cireddu:2023:arXiv,JanssensKamiel2023Ffps}. 
+Ignoring correlated noise in analyses of \ac{GW} can lead to biased parameter estimates and incorrect astrophysical conclusions (e.g. in analysing the stochastic \ac{GW} background~\cite{Thrane_correlations_SGWB, Christensen_2019_SGWB, boileau2022figures} and transient signals from events like binary black hole mergers~\cite{Cireddu:2023:arXiv}). 
+Although recent studies have proposed methods for handling correlated noise and estimating spectral densities, a flexible Bayesian approach for matrix-valued spectral density estimation is needed~\cite{Cireddu:2023:arXiv,JanssensKamiel2023Ffps} . 
 Such an approach needs to be nonparametric, i.e., robust w.r.t.\ deviations from certain parametric shapes such as power laws in order to be able to capture all potential small- and large-scale noise characteristics.
 Furthermore, the approach needs to be computationally efficient when applied to long time series of \ac{GW} observations. 
 \citet{MeierAlexander2020Bnao} and \citet{Liu2023} have developed a nonparametric Bayesian approach to multivariate spectral density estimation based on the Whittle likelihood and a positive semidefinite matrix-Gamma process prior on the spectral density matrices and used an adaptive MCMC algorithm to sample from the posterior. 
@@ -131,18 +121,16 @@ This method transforms complex posterior sampling into an optimization problem, 
 Recent advances in VI, such as normalizing flows, have demonstrated its effectiveness for pulsar timing-array datasets~\cite{Vallisneri2024}. 
 
 We apply the SGVB approach to simulated ET noise, demonstrating its flexibility and applicability to other detectors like LISA and the LIGO-Virgo-KAGRA (LVK) network.
-To manage large time series, we introduce a blocked Whittle likelihood approximation\citeme. 
-We also provide guidance on SGVB tuning parameters such as learning rates and basis functions. 
-In addition, we computed the coherence as a function of frequency, quantifying correlations in the multivariate time series.
+To manage large time series, we introduce a blocked Whittle likelihood approximation. 
+We also provide guidance on SGVB tuning parameters such as learning rates and basis functions. Additionally, we compute the coherence as a function of frequency, quantifying correlations in the multivariate time series.
 
-In this article, we demonstrate the usefulness and flexibility of a SGVB approach for estimating the spectral density matrix of the correlated instrumental noise from a  network of gravitational wave detectors.
+Here we demonstrate the usefulness and flexibility of a SGVB approach for estimating the spectral density matrix of the correlated instrumental noise from a  network of gravitational wave detectors.
 In particular, we illustrate this using simulated ET noise but note that this approach is readily applicable to estimate  \ac{LISA} instrumental noise or correlated \ac{LVK} noise induced by magnetic noise/Schumann? resonances.
-\todo{change ``here" to smth else}
 To ease computational efforts of handling large time series, we introduce and utilise a blocked Whittle likelihood approximation rather than the traditional Whittle likelihood. 
 We provide advice on choosing tuning parameters such as the learning rate and number of basis functions in the SGVB approach. 
 Finally, as a by-product of this method, we also compute the coherence as a function of frequency, quantifying the degree of correlation between components of the multivariate time series. 
 
-The remainder of this article is structured as follows. 
+The remainder of this letter is structured as follows. 
 Section~\ref{sec:method} introduces the \ac{SGVB} method and defines the blocked Whittle likelihood.
 We test the efficiency and accuracy of the SGVB approach using simulations in Section~\ref{sec:simulation}.
 Finally, Section~\ref{sec:application} presents results of the method applied to simulated \ac{ET} datasets consisting of varying levels of correlated noise. 
@@ -153,15 +141,12 @@ Finally, Section~\ref{sec:application} presents results of the method applied to
 \subsection{Likelihood}
 %\RM{The Cireddu paper is not quite exact with sampling frequency, length of time series (n) and length of FT (N$\approx$ n/2) so best to introduce this explicitly and exactly here. Also, the determinant is missing as they treat $S$ as fixed. $S$ does not depend on any parameter, it is completely flexible.}
 
-\todo{change transpose T to intercal throught the paper (different from duration)}
-Let $\Z=(\Z_1,\ldots,\Z_n)^ \intercal\in  \mathbb{R}^{n\times p}$ be a $p$-dimensional stationary, mean-zero time series, sampled at time intervals $\Delta_t=1/(2f_{Ny})$, where $f_{Ny}$ is the Nyquist frequency, for a total observation time of $T$ with a total of $n=T/\Delta_t$ sampled values for each of the $p$ channels. Let $\d_k$ be the \ac{DFT} of $\Z$ given by 
-\todo{Link the eq with text}
-\todo{use big ( }
+Let $\Z=(\Z_1,\ldots,\Z_n)^T\in  \mathbb{R}^{n\times p}$ be a $p$-dimensional stationary, mean-zero time series, sampled at time intervals $\Delta_t=1/(2f_{Ny})$, where $f_{Ny}$ is the Nyquist frequency, for a total observation time of $T$ with a total of $n=T/\Delta_t$ sampled values for each of the $p$ channels. Let $\d_k$ be the \ac{DFT} of $\Z$ 
 \begin{align*}
-\d(f_k) = \sum_{t=1}^{n} \Z_t\exp(-2\pi i \frac{k}{n} t)\, ,
+\d(f_k) = \sum_{t=1}^{n} \Z_t\exp(-2\pi i \frac{k}{n} t)
 \end{align*}
  where $f_k= k \Delta_f= k \frac{1}{n\Delta_t}=k \frac{1}{T}$ for $k=1,\ldots, N=n/2$.
-
+% \RM{someone needs to carefully check these formulas as I usually assume sampling frequency is 1.}
 Due to the normalizing and decorrelating properties of the Fourier transform, the discrete Fourier coefficients $\d(f_k)$ (multiplied by $\frac{1}{\sqrt{n}}$) are asymptotically independent and have a complex Gaussian distribution with covariance matrix given by the spectral density matrix $\S(f_k)$,  the Fourier transform of the autocovariance function. This asymptotic Gaussian distribution is the basis of the multivariate Whittle likelihood approximation in the frequency domain:
 \begin{align}\label{eq:Whittle likelihood}
  \mathcal{L}(\d|\S) &\propto  \prod_{k=1}^{N} \det(\S(f_k))^{-1} \times \nonumber \\
@@ -181,9 +166,8 @@ Given $\d$, one method to estimate the multivariate spectral density matrix $\S$
 where $\pi(\S)$ is the prior distribution and $p(\S|\d)$ is the posterior density of unknown $\S$ given $\d$, 
 and $\mathcal{Z}(\d)$ is the Bayesian evidence (see ~\citet{thrane_talbot_bayesian_primer} and ~\citet{Christensen_PE_for_GW} for discussions on \ac{GW} Bayesian inference).
 
-\avi{give introductory scentence... why are we doing a blocked? is the normal ok? one scentence}
-To handle large datasets, we use a `blocked' Whittle likelihood $\mathcal{L}_b(\d|\S)$\citeme. 
-We divide the time series into $N_{b}$ equal-sized blocks $\Z=(\Z^{(1)},\ldots,\Z^{(N_{b})})^T$ with each block a $p$-dimensional time series of each of length $n/N_{b}$. The discrete Fourier transform of each block is denoted by 
+
+To handle large datasets, we use a `blocked' Whittle likelihood $\mathcal{L}_b(\d|\S)$. We divide the time series into $N_{b}$ equal-sized blocks $\Z=(\Z^{(1)},\ldots,\Z^{(N_{b})})^T$ with each block a $p$-dimensional time series of each of length $n/N_{b}$. The discrete Fourier transform of each block is denoted by 
 $\d^{(i)}$, $i=1,\ldots,N_{b}$. The stationarity assumption implies that the statistical properties of each block, in particular their spectral densities, are the same.
 Assuming independence of different blocks, 
 the likelihood then becomes the product of the individual blocked Whittle likelihoods (each of which can be computed in parallel), 
@@ -248,13 +232,13 @@ The approach can be futher parallelised by computing each of the likelihood `blo
 
 In this section we provide a brief review of SGVB, along with discussions on how to tune the learning rate and the number of spline baises.
 
-\paragraph{Variational Inference review:}
+\paragraph{VI review:}
 The fundamental concept of \ac{VI} is to approximate the posterior distribution, $p_j(\bnu_j|\d_j)$ using a surrogate distribution from a family of variational distributions ${\cal Q}_j=\{ q_{\phi_j}(\bnu_j); \phi_j \in \Phi_j \}$, which depends on a parameter vector $\phi_j$ within a parameter space $\Phi_j$.
 Typically, the variational family is selected for its simplicity and computational tractability. 
 In our approach, we utilize a product of Normal distributions with mean $\mu_{ji}$ and variance $\sigma^2_{ji}$ for each element of the parameter $\bnu_j$. 
 The goal of the variational approach is to identify the parameters $\phi_j=((\mu_{ji},\sigma^2_{ji}), i=1,\ldots,\mbox{dim}(\bnu_j))$ that minimize the reverse Kullback-Leibler divergence between the variational family and the true posterior distribution, denoted as $d_{KL}(q_{\phi_j}||p_j)$), i.e.,
 \begin{equation}\label{eq:phi_min}
-    \phi_j^*=\argmin_{\phi_j} d_{KL}(q_{\phi_j}||p_j)\, , 
+    \phi_j^*=argmin_{\phi_j} d_{KL}(q_{\phi_j}||p_j)\, , 
 \end{equation}
 where 
 \begin{equation}
@@ -302,7 +286,7 @@ While \citet{Hu2023} selected a specific but arbitrary value for the learning ra
 Let $\tau_1$ and $\tau_2$ be the learning rates associated with the first and second steps. 
 We obtain an appropriate $\tau_1$ by maximizing the ELBO for a given $\log p(\boldsymbol{\nu}_j|\mathbf{d}_j)$ with a normal density approximation,
 \begin{equation}
-\tau_1^* = \argmax_{\tau_1} \text{ELBO}(q_{\phi_j}, p_j(\boldsymbol{\nu}_j|\mathbf{d}_j)) \,.    
+\tau_1^* = argmax_{\tau_1} \text{ELBO}(q_{\phi_j}, p_j(\boldsymbol{\nu}_j|\mathbf{d}_j)) \,.    
 \end{equation}
 We conduct this optimisation over a continuous parameter space using the Python package \hyperopt~\cite{Bergstra2013} and the tree-structured Parzen Estimator (TPE) algorithm~\cite{Bergstra2011}. 
 While a similar approach can be conducted to optimise $\tau_2$, we find a broad range of plausible values for $\tau_2$, rendering it unnecessary to be altered from \citet{Hu2023}'s default settings. We set the maximum number of iterations for the optimisation procedure to \num{10 000}. 
@@ -319,16 +303,15 @@ C_{xy}(f_k) = \frac{|\S_{xy}(f_k)|^2}{\S_{xx}(f_k)\S_{yy}(f_k)}
 
 where $\S_{xy}(f_k)$ is the cross-spectral density between components $x$ and $y$, and $\S_{xx}(f_k)$, $\S_{yy}(f_k)$ are the spectral densities of components $x$ and $y$, respectively, at frequency $f_k$ $(x,y = 1,2,...,p; x\neq y)$.
 
-\avi{Include table of Cxy reference? what does Cxy of 0.02 mean, vs 0.5 (our results?}
-\avi{Can we compute the ``true'' Cxy? I think it would be good to show this. }
+
 
 
 \section{Simulation study}
 \label{sec:simulation}
 
 We generate 500 independent realisations of bivariate time series from VAR(2) and VMA(1) models, using three  different sample sizes $n=256,512,1024$ (refer to \citet[Section~4.2,][]{Liu2023} for the definitions of the VAR(2) and VMA(1) models). 
-We estimate the spectral densities using both the \ac{SGVB} method and \citet{Liu2023}'s MCMC-based approach (VNPC), which samples from the exact posterior distribution without a variational approximation
-\footnote{For the VNPC analyses, we use the software and settings provided by \citet{Liu2023}, specific for the VAR(2) and VMA(1) models.}.
+We estimate the spectral densities using both the \ac{SGVB} method and \citet{Liu2023}'s MCMC-based approach (VNPC), which samples from the exact posterior distribution without a variational approximation. 
+\footnote{For the VNPC analyses, we use the software and settings provided by \citet{Liu2023}, specific for the VAR(2) and VMA(1) models.}
 
 In order to avoid underfitting in SGVB, we determine an appropriate number of basis functions for each dataset using the method from Section~\ref{subsec:sgvb_details}. 
 Figure~\ref{fig:sim_basis} shows the MLE (normalised for comparison between datasets) plotted against the number of basis functions.
@@ -355,17 +338,14 @@ We set $M=30$ as the MLE appears stable by this point.
 
 Given an estimated spectral density matrix $\hat{\bm{f}}$ and the true spectral density matrix $\bm{f}_0$, we can evaluate the accuracy of PSD estimates using the $L_2$ error. 
 The $L_2$ error is defined as
-% \begin{eqnarray*}
-% ||\hat{\bm{f}} - \bm{f}_0||_{L_2} &=& %\left(\int_{0}^{0.5} ||\hat{\bm{f}}_0(f_K) - \bm{f}_0(f_K)||^2 d\nu \right)^{\frac{1}{2}} \\
-\begin{equation}
- ||\hat{\bm{f}} - \bm{f}_0||_{L_2}  \approx \left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\bm{f}}_0(f_K)-\bm{f}_0(f_K)||^2 \right)^{\frac{1}{2}}\, ,
-\end{equation}
+\begin{eqnarray*}
+||\hat{\bm{f}} - \bm{f}_0||_{L_2} &=& \left(\int_{0}^{0.5} ||\hat{\bm{f}}_0(\nu) - \bm{f}_0||^2 d\nu \right)^{\frac{1}{2}} \\
+&\approx &\left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\bm{f}}_0(\nu_k)-\bm{f}_0(\nu_k)||^2 \right)^{\frac{1}{2}}\, ,
+\end{eqnarray*}
 where $\Vert \cdot \Vert$ denotes the Frobenius norm, i.e., defined for a complex $p\times p$ matrix $\A$ by
 $\displaystyle \Vert \A\Vert= \sqrt{\sum_{i,j} |a_{ij}|^2}$.
-\avi{We need to explain the L2 error better... I dont understand what v is, i dont understand what l2 of 0 or 100 would mean.}
 
-
-Figure~\ref{fig:sim_error_violins}ab displays the $L_2$ errors from both the SGVB and VNPC methods, computed using the true spectral densities of the VAR(2) simulations and VMA(1) simulations, shown in panels a and b, respectively. 
+Figure~\ref{fig:sim_error_violins}ab displays the $L_2$ errors from both the SGVB and VNPC methods, computed using the true spectral densities of the (a) VAR(2) simulations and (b) VMA(1) simulations. 
 Figure~\ref{fig:sim_error_violins}c displays the speed-up factor of the SGVB compared to the VNPC method. 
 As the sample size increases, both methods obtain lower (and similar) $L_2$ errors, while the speed-up factor for SGVB increases to more than 50 times VNPC.
 
@@ -386,7 +366,6 @@ We synthesized three independent realizations of Gaussian noise (one for each of
 The small difference between PSD curves will have no impact on the key conclusions of the applicability of the work presented in this paper.
 }.
 The noise was sampled at a frequency of \SI{2048}{Hz}, resulting in a multivariate time series comprising \num{4096000} data points per channel. 
-\todo{clean uo num with K (SI package)}
 In the rest of the paper we refer to this colored Gaussian noise as \textit{ET noise}.
 
 
@@ -460,8 +439,10 @@ Each Whittle likelihood block utilises identical basis function expressions for 
 
 Figure~\ref{et_corr_basis_funs_vs_mle} displays the log MLE versus the number of basis functions for each case. 
 Observing the log MLE stabilising as the number of basis functions increase, we set the number of basis functions to be $M=450$.
-Using the methodology from Section~\ref{sec:method} we estimate the PSD for each case and plot the PSD in Figure~\ref{fig:ET_PSDS}. For each case, the diagonal subplots represent the spectral densities for X, Y and Z channels. Since the off-diagonal elements of the PSD matrix at each frequency are complex numbers, with the elements above the diagonal being the conjugates of those below, we plot the real part of the off-diagonal elements in the upper subplot and the imaginary part in the lower subplot.
-We additionally plot the squared coherences for the cases in Figure~\ref{fig:squared_coh}. The plot shows the squared coherences estimation between any pair of channels for case A and case B.
+Using the methodology from Section~\ref{sec:method} we estimate the PSD for each case and plot the PSD in Figure~\ref{fig:ET_PSDS}. For each case, the diagonal subplots represent the spectral densities for X, Y and Z channels. Since the off-diagonal elements of the PSD matrix at each frequency are complex numbers with the elements above the diagonal being the conjugates of those below, 
+We additionally plot the squared coherences for the cases in Figure~\ref{fig:squared_coh}.
+\avi{Jianan talk about the plot a bit here -- why are there complex numbers? why are only the real and img parts shown in the off-diagonals?} 
+
 
 \begin{figure*}[]
 \centering
@@ -484,7 +465,7 @@ We additionally plot the squared coherences for the cases in Figure~\ref{fig:squ
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{caseAB_coh.pdf}
-  \caption{Squared coherence estimation for any pair of channels in cases A (top) and B (bottom). The solid curves represent the median estimated squared coherences, while the shaded areas indicate the corresponding 90\% CI.}
+  \caption{Squared coherence estimates for cases A (top) and B (bottom). The plot shows the squared coherences estimation between any pair of channels for three cases (colored, with 90\% CI shaded).}
   \label{fig:squared_coh}
 \end{figure}
 
@@ -592,7 +573,7 @@ support.
 We generate 50 independent realizations of the VAR(2) model, each with a length of \(2^{17}\). 
 For each realization, we calculate the traditional log likelihood using the entire dataset. 
 Subsequently, we partition each dataset into varying numbers of blocks to compute the blocked log likelihood for each configuration. 
-The median blocked log likelihood is then determined across the 50 realizations for each block configuration.
+The average blocked log likelihood is then determined across the 50 realizations for each block configuration.
 
 Figure~\ref{fig:lnl_vs_nchunks} illustrates the inverse relationship between the number of blocks and the blocked log likelihood, relative to the traditional log Whittle likelihood (one block). 
 As the number of blocks increases, the log likelihood consistently decreases.
@@ -604,7 +585,7 @@ This trend highlights the need for an optimal balance between computational effi
 
 \begin{figure}[h]
   \includegraphics[width=\columnwidth]{lnl_vs_nchunks}
-  \caption{Blocked Whittle likelihood as a function of the number of blocks utilised. The solid green curve represent the median values, while the shaded areas indicate the corresponding 90\% CI.}
+  \caption{Blocked Whittle likelihood as a function of the number of blocks utilised.}
   \label{fig:lnl_vs_nchunks}
 \end{figure}
 

@@ -36,7 +36,7 @@ def plot_et_matrix(
         spec_mat_median = f['ETnoise_correlated_GP_spec_mat_median_XYZ'][:]
         spec_mat_lower = f['ETnoise_correlated_GP_spec_mat_lower_XYZ'][:]
         spec_mat_upper = f['ETnoise_correlated_GP_spec_mat_upper_XYZ'][:]
-
+        
     # upload the true psd data
     file_path =f'{paths.data}/ET(1).txt'
     ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
@@ -90,7 +90,7 @@ def plot_et_matrix(
                 f, Pxx_den0 = signal.periodogram(channels[:, i], fs=channels.shape[0] / time_interval)
                 f = f[1:]
                 Pxx_den0 = Pxx_den0[1:] / 2
-                axes[i, j].plot(f, Pxx_den0, marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10, rasterized=True)
+                axes[i, j].plot(f, Pxx_den0, marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].plot(freq, spec_mat_median[..., i, i] / (q) ** 2 / (freq_original[-1] / 0.5), linewidth=1,
                                 color=psd_col, linestyle="-")
@@ -135,7 +135,7 @@ def plot_et_matrix(
                 cross_spectrum_fij = y[:, i] * np.conj(y[:, j])
 
                 axes[i, j].plot(f, np.real(cross_spectrum_fij) / (freq_original[-1] / 0.5),
-                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10, rasterized=True)
+                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].text(0.95, 0.95, r'$\Re(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
@@ -164,7 +164,7 @@ def plot_et_matrix(
                 cross_spectrum_fij = y[:, i] * np.conj(y[:, j])
 
                 axes[i, j].plot(f, np.imag(cross_spectrum_fij) / (freq_original[-1] / 0.5),
-                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10, rasterized=True)
+                                marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
                 axes[i, j].text(0.95, 0.95, r'$\Im(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
