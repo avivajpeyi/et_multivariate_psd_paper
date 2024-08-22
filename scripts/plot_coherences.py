@@ -10,6 +10,32 @@ PSD_FILL_ALPHA = 0.3
 LABEL_FS = 'x-large'
 
 
+def compute_true_coherence():
+    file_path = f'{paths.data}/ET(1).txt'
+    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak10Hz_new.txt'
+    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak50Hz_new.txt'
+    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak90Hz_new.txt'
+    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    ASD_X = ET_1[:, 1] + Peak10Hz[:, 1] + Peak50Hz[:, 1]
+    ASD_Y = ET_1[:, 1] + Peak10Hz[:, 1] + Peak90Hz[:, 1]
+    ASD_Z = ET_1[:, 1] + Peak50Hz[:, 1] + Peak90Hz[:, 1]
+
+    c_xy = Peak10Hz[:, 1] ** 2 / (ASD_X * ASD_Y)
+    c_xz = Peak50Hz[:, 1] ** 2 / (ASD_X * ASD_Z)
+    c_yz = Peak90Hz[:, 1] ** 2 / (ASD_Y * ASD_Z)
+    freq_true = ET_1[:, 0]
+    return dict(c_xy=c_xy, c_xz=c_xz, c_yz=c_yz, freq_true=freq_true)
+
+
+
+
 def plot_coherences(coherence_file_path, ax=None, case='A'):
     # Load frequency data
     freq = np.load(f"{paths.data}/freq.npz")['arr_0']
@@ -54,9 +80,10 @@ def plot_coherences(coherence_file_path, ax=None, case='A'):
     
     # Plot c_xy, c_xz, c_yz only for Case A
     if case == 'A':
-        ax.plot(freq_true, c_xy, color='C0', linestyle='--', label='c_xy')
-        ax.plot(freq_true, c_xz, color='C1', linestyle='--', label='c_xz')
-        ax.plot(freq_true, c_yz, color='C2', linestyle='--', label='c_yz')
+        kwgs = dict(color='k', linestyle='--', lw=0.5)
+        ax.plot(freq_true, c_xy, **kwgs)
+        ax.plot(freq_true, c_xz, **kwgs)
+        ax.plot(freq_true, c_yz, **kwgs, label='True')
 
     ax.set_ylim(bottom=0)
     return ax.get_figure()
@@ -82,8 +109,9 @@ def main():
         markerscale=2,  # Scale factor for marker size in the legend
         fontsize='small',
     )
-    for handle in legend.legendHandles:
+    for handle in legend.legend_handles:
         handle.set_linewidth(3)
+
 
 
     axes[0].text(0.02, 0.98, 'Case A', transform=axes[0].transAxes, fontsize=10, verticalalignment='top',
@@ -107,39 +135,6 @@ if __name__ == '__main__':
     main()
 
 ######################################################################################################
-file_path = f'{paths.data}/ET(1).txt'
-ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-file_path = f'{paths.data}/Peak10Hz_new.txt'
-Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-file_path = f'{paths.data}/Peak50Hz_new.txt'
-Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-file_path = f'{paths.data}/Peak90Hz_new.txt'
-Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-ASD_X = ET_1[:,1] + Peak10Hz[:,1] + Peak50Hz[:,1]
-ASD_Y = ET_1[:,1] + Peak10Hz[:,1] + Peak90Hz[:,1]
-ASD_Z = ET_1[:,1] + Peak50Hz[:,1] + Peak90Hz[:,1]
-
-c_xy = Peak10Hz[:,1]**2 / (ASD_X * ASD_Y)
-c_xz = Peak50Hz[:,1]**2 / (ASD_X * ASD_Z)
-c_yz = Peak90Hz[:,1]**2 / (ASD_Y * ASD_Z)
-freq_true = ET_1[:,0]
-
-fig, ax = plt.subplots()
-ax.plot(freq_true, c_xy, label='c_xy', color='blue')
-ax.plot(freq_true, c_xz, label='c_xz', color='green')
-ax.plot(freq_true, c_yz, label='c_yz', color='red')
-
-ax.set_xlim([5, 128])
-ax.legend()
-
-ax.set_xlabel('Frequency [Hz]')
-ax.set_ylabel('Coherence')
-
-plt.show()
 
 
 
