@@ -10,8 +10,8 @@ import paths
 def main():
     lnl_no_chunks = pd.read_csv(f'{paths.data}/likelihood_without_chunk.csv').values
     lnl_chunks = pd.read_csv(f'{paths.data}/likelihood_with_chunks.csv').values
-    rel_lnl = lnl_chunks - lnl_no_chunks
-    lnl_quantiles = np.quantile(rel_lnl, [0.05, 0.5, 0.95], axis=0)
+    rel_lnl = 100*np.abs(lnl_no_chunks-lnl_chunks)/np.abs(lnl_no_chunks)
+    lnl_quantiles =np.quantile(rel_lnl, [0.05, 0.5, 0.95], axis=0)
 
     total_length = 2**17
     x = range(8)
@@ -28,11 +28,13 @@ def main():
     power_labels = [f'$2^{i}$' for i in x]
     ax.set_xticks(x)
     ax.set_xticklabels(power_labels)
-    ax.set_ylim(bottom=-300)
+    # ax.set_ylim(bottom=-300)
+    # ax.set_yscale('log')
     ax.set_xlim(x[0],x[-1])
 
+
     plt.xlabel(r'$N_b$')
-    plt.ylabel(r'$\log \mathcal{L}(\bf{d}) - \log \mathcal{L}_b(\bf{d})$')
+    plt.ylabel(r'Relative Error')
     secax = ax.secondary_xaxis('top')
     ax.xaxis.set_tick_params(which='minor',top=False, bottom=False)
     secax.xaxis.set_tick_params(which='minor',top=False, bottom=False)
@@ -47,4 +49,5 @@ def main():
     plt.savefig(f'{paths.figures}/lnl_vs_nchunks.pdf', dpi=300)
 
 
-main()
+if __name__ == "__main__":
+    main()
