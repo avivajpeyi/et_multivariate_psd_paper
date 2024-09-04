@@ -1,10 +1,9 @@
 import h5py
-import numpy as np
-from scipy import signal
 import matplotlib.pyplot as plt
 import paths
-from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FixedLocator
+import matplotlib.ticker as ticker
+import numpy as np
 import pandas as pd
 PSD_FILL_ALPHA = 0.3
 LABEL_FS = 'x-large'
@@ -79,13 +78,20 @@ def plot_coherences(coherence_file_path, ax=None, case='A'):
                         color=f'C{i}', alpha=PSD_FILL_ALPHA, edgecolor='none', zorder=-10)
     
     # Plot c_xy, c_xz, c_yz only for Case A
+    true_kwgs = dict(color='k', linestyle='--', lw=0.5)
     if case == 'A':
-        kwgs = dict(color='k', linestyle='--', lw=0.5)
-        ax.plot(freq_true, c_xy, **kwgs)
-        ax.plot(freq_true, c_xz, **kwgs)
-        ax.plot(freq_true, c_yz, **kwgs, label='True')
+        ax.plot(freq_true, c_xy, **true_kwgs)
+        ax.plot(freq_true, c_xz, **true_kwgs)
+        ax.plot(freq_true, c_yz, **true_kwgs, label='True')
+    if case == 'B':
+        num_blocks = 125
+        ax.axhline(1/num_blocks, **true_kwgs)
 
-    ax.set_ylim(bottom=0)
+
+    ax.set_yscale('log')
+    ax.set_ylim(1e-3, 1.5)
+    ax.yaxis.set_major_formatter(
+        ticker.FuncFormatter(lambda y, pos: ('{{:.{:1d}f}}'.format(int(np.maximum(-np.log10(y), 0)))).format(y)))
     return ax.get_figure()
 
 
@@ -104,10 +110,20 @@ def main():
         ax.tick_params(axis='both', which='both', zorder=10)
         # turn off minor ticks
         ax.xaxis.set_minor_locator(FixedLocator([]))
+        ax.yaxis.set_minor_locator(FixedLocator([]))
+
+
     legend = axes[0].legend(
+        handles=[
+            plt.Line2D([0], [0], color='k',  label='True'),
+            plt.Line2D([0], [0], color='C0', label='XY'),
+            plt.Line2D([0], [0], color='C1', label='XZ'),
+            plt.Line2D([0], [0], color='C2', label='YZ'),
+        ],
         handlelength=1,  # Length of the legend line handles
         markerscale=2,  # Scale factor for marker size in the legend
         fontsize='small',
+        labelspacing=0.05, columnspacing=0.25,
     )
     for handle in legend.legend_handles:
         handle.set_linewidth(3)
@@ -119,15 +135,26 @@ def main():
     axes[1].text(0.02, 0.98, 'Case B', transform=axes[1].transAxes, fontsize=10, verticalalignment='top',
                  horizontalalignment='left')
 
+    # axes0 set yticks to 1, 0.1, 0.01
+    axes[0].set_yticks([1, 0.1, 0.01])
+    axes[0].set_yticklabels(['1', '0.1', '0.01'])
+
+    axes[1].set_yticks([1, 0.1, 0.01, 0.001])
+    axes[1].set_yticklabels(['1', '0.1', '0.01', '0.001'])
+
+
+    # reduce ytick label size
+    for ax in axes:
+        ax.tick_params(axis='both', labelsize='small')
+        ax.tick_params(axis='y', which='major', pad=0.2)
+
+
     # remove verrical whitespaace beteweenn subplots
     axes[1].set_xlabel('Frequency [Hz]')
     plt.subplots_adjust(hspace=0., wspace=0.)
     for ax in axes:
-        ax.set_ylabel(r'$C_{xy}$', labelpad=-10)
-    fig.align_ylabels(axes)
-
-    # fig.text(0.002, 0.5, r'$C^2_{xy}$', va='center', ha='center', rotation='vertical', fontsize=LABEL_FS)
-    # plt.subplots_adjust(left=0.2)  # Adjust left margin to make room for the y-axis label
+        ax.set_ylabel(r'$C_{xy}$', labelpad=-8)
+    fig.align_ylabels(axes, )
     fig.savefig(f'{paths.figures}/caseAB_coh.pdf')
 
 
