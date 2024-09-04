@@ -351,11 +351,11 @@ When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$ due t
   \label{fig:sim_speed_violins}
 \end{figure}
 
-Given an estimated spectral density matrix $\hat{\bm{f}}$ and the true spectral density matrix $\bm{f}_0$, the accuracy of PSD estimates can be assessed using the $L_2$ error. The $L_2$ error provides a quantitative measure of the discrepancy between  $\hat{\bm{f}}$ and $\bm{f}_0$, encapsulating the overall difference between the estimated and true spectral density matrices across the frequency range. 
-A smaller $L_2$ error indicates that $\hat{\bm{f}}$ closely approximates $\bm{f}_0$, while a larger $L_2$ error reflects greater deviation.
+Given an estimated spectral density matrix $\hat{\S}$ and the true spectral density matrix $\S_0$, the accuracy of PSD estimates can be assessed using the $L_2$ error. The $L_2$ error provides a quantitative measure of the discrepancy between  $\hat{\S}$ and $\S_0$, encapsulating the overall difference between the estimated and true spectral density matrices across the frequency range. 
+A smaller $L_2$ error indicates that $\hat{\S}$ closely approximates $\S_0$, while a larger $L_2$ error reflects greater deviation.
 The $L_2$ error can be approximated as
 \begin{equation}
- ||\hat{\bm{f}} - \bm{f}_0||_{L_2}  \approx \left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\bm{f}}_0(f_k)-\bm{f}_0(f_k)||^2 \right)^{1/2}\, ,
+ ||\hat{\S} - \S_0||_{L_2}  \approx \left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\S}_0(f_k)-\S_0(f_k)||^2 \right)^{1/2}\, ,
 \end{equation}
 where $\Vert \cdot \Vert$ denotes the Frobenius norm, which  for a complex $p\times p$ matrix $\A$ is defined by
 \begin{equation}
@@ -448,8 +448,7 @@ Three analyses are performed to estimate the power spectral density (PSD) and th
 \end{itemize}
 
 
-Given that the Gaussian peaks are concentrated within the first \SI{128}{Hz}, the data is divided into 125 equal blocks, each comprising \SI{32738} data point, and a frequency resolution of 2048 points.
-Each block is Fourier transformed, generating the 125 blocks of input data (each consisting of \num{16 384} points) for the blocked Whittle likelihood estimation (Equation~\ref{eq:block_lnl}). 
+The data is divided into 125 equal blocks, each consisting of \num{16 384} frequency points and a maximum frequency of \SI{1024}{Hz} for the blocked Whittle likelihood estimation (Equation~\ref{eq:block_lnl}). 
 Each Whittle likelihood block uses identical basis function expressions defined in Section~\ref{subsec: parameters} for the spectral density matrix. 
 
 Figure~\ref{et_corr_basis_funs_vs_mle} displays the log maximum
