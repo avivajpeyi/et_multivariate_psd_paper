@@ -57,15 +57,15 @@ def plot_Sxx_ratio(ax, case, color):
     # interpolate the true S_xx to match f of the estimated S_xx
     true_sxx = interp.interp1d(true_f, true_sxx, kind='cubic', bounds_error=False, fill_value='extrapolate')(f)
     ratio = np.exp(np.log(sxx) - np.log(true_sxx))
-    # ax.plot(f, ratio[1], color=color, label=f"Case {case}")
-    # ax.fill_between(f, ratio[0], ratio[2], color=color, alpha=0.3, lw=0)
+    ax.plot(f, ratio[1], color=color, label=f"Case {case}")
+    ax.fill_between(f, ratio[0], ratio[2], color=color, alpha=0.3, lw=0)
     #
     #
 
-
-    ax.plot(f,sxx[1], color=color)
-    ax.fill_between(f, sxx[0], sxx[2], color=color, alpha=0.3, lw=0)
-    ax.plot(f,true_sxx, color='k', label=case)
+    # TODO: jianan -- i think the scaling is different...
+    # ax.plot(f,sxx[1], color=color)
+    # ax.fill_between(f, sxx[0], sxx[2], color=color, alpha=0.3, lw=0)
+    # ax.plot(f,true_sxx, color='k', label=case)
 
 
     ax.set_xlim([5, 128])
