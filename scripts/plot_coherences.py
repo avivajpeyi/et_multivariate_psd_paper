@@ -114,9 +114,16 @@ def main():
 
 
     legend = axes[0].legend(
+        handles=[
+            plt.Line2D([0], [0], color='k',  label='True'),
+            plt.Line2D([0], [0], color='C0', label='XY'),
+            plt.Line2D([0], [0], color='C1', label='XZ'),
+            plt.Line2D([0], [0], color='C2', label='YZ'),
+        ],
         handlelength=1,  # Length of the legend line handles
         markerscale=2,  # Scale factor for marker size in the legend
         fontsize='small',
+        labelspacing=0.05, columnspacing=0.25,
     )
     for handle in legend.legend_handles:
         handle.set_linewidth(3)
