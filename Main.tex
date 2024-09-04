@@ -119,28 +119,23 @@ The method is demonstrated by analysing \SI{2000}{\second} of simulated Einstein
 The next-generation \ac{GW} detectors, e.g. \ac{ET}~\cite{Punturo_2010}, \ac{CE}~\cite{CE_horizon_study}, and \ac{LISA}~\cite{LISA_science_case}, will usher in a transformative era of \ac{GW} astronomy. 
 The increased sensitivity to \ac{GW} will lead to a much higher \ac{GW} detection rate, improving our understanding of cosmic phenomena, ranging from the dynamics of black hole mergers to the nature of the early universe~\cite{ET_science_case, Maggiore_2020_ET_science_case, Branchesi_2023_ET_science_case, CE_horizon_study, LISA_science_case}.
 
-Despite their advanced capabilities, these detectors face new challenges, particularly in managing correlated multivariate noise~\cite{ET_design_report,LISA_red_book}.
+However, multivariate time series analysis of future GW detector data faces challenges in managing correlated multivariate noise~\cite{ET_design_report,LISA_red_book}.
 \ac{ET} and \ac{LISA}, which consist of co-located interferometers, may experience correlated noise in their data streams~\cite{Janssens2023}. 
 For \ac{ET}, this correlated noise can stem from seismic, Newtonian, and magnetic sources~\cite{Ball_lightning_strokes, Janssens_newtonian_seismic, Janssens_magnetic_noise}, while \ac{LISA}  may encounter noise from temperature variations and micro-thrusters~\cite{lisa_temp_noise,lisa_thrusters_noise}. 
 
-These detectors often require multivariate time series analyses to account for the multiple channels of data collected simultaneously, where each channel corresponds to a different interferometer, and correlations between these channels can complicate the analysis.
-Ignoring correlated noise in analyses of \ac{GW} can lead to biased parameter estimates and incorrect astrophysical conclusions (e.g., in analysing the stochastic \ac{GW} background~\cite{Thrane_correlations_SGWB, Christensen_2019_SGWB, boileau2022figures} and transient signals from events like binary black hole mergers~\cite{Cireddu:2023:arXiv}). 
-Although recent studies have shown the necessity for methods that can handle correlated noise~\cite{Cireddu:2023:arXiv,JanssensKamiel2023Ffps}, so far no method has been suggested to estimate  multivariate spectral densities  of gravitational wave network data. In particular, a flexible Bayesian approach for matrix-valued spectral density estimation is needed. 
+Ignoring correlated noise in analyses of multivariate \ac{GW} data can lead to biased parameter estimates and incorrect astrophysical conclusions (e.g., in analysing the stochastic \ac{GW} background~\cite{Thrane_correlations_SGWB, Christensen_2019_SGWB, boileau2022figures} and transient signals from events like binary black hole mergers~\cite{Cireddu:2023:arXiv}). 
+Although recent studies have shown the need for methods that can handle correlated noise~\cite{Cireddu:2023:arXiv,JanssensKamiel2023Ffps}, so far no method has been suggested to estimate  multivariate spectral densities  of gravitational wave network data. 
+In particular, a flexible Bayesian approach for matrix-valued spectral density estimation is needed. 
 Such an approach needs to be nonparametric, i.e., robust with respect to deviations from certain parametric shapes such as power laws in order to be able to capture all potential small- and large-scale noise characteristics.
 Furthermore, the approach must exhibit computational efficiency when applied to long time series of \ac{GW} observations, as in the case of ET and LISA. 
-\citet{MeierAlexander2020Bnao} and \citet{Liu2023} have developed  nonparametric Bayesian approaches to multivariate spectral density estimation based on the Whittle likelihood and a Bernstein -- Hermitian positive semidefinite matrix-Gamma process prior on the spectral density matrix and used an adaptive MCMC algorithm to sample from the posterior. 
-While theoretically attractive with proven consistency properties and contraction rates, MCMC methods require significant computation time due to the complexity of sampling from high-dimensional posterior distributions, making them impractical for long time series of \ac{GW} observations, where the computational burden increases dramatically.
+\citet{MeierAlexander2020Bnao} and \citet{Liu2023} have developed non-parametric Bayesian approaches to multivariate spectral density estimation based on the Whittle likelihood and a Bernstein -- Hermitian positive semidefinite matrix-Gamma process prior on the spectral density matrix and used an adaptive MCMC algorithm to sample from the posterior. 
+Although theoretically attractive with proven consistency properties and contraction rates, MCMC methods require significant computation time due to the complexity of sampling from high-dimensional posterior distributions, making them impractical for long time series of \ac{GW} observations, where the computational burden increases dramatically.
 
 
 In this paper, a stochastic gradient variational Bayes (SGVB) approach, as developed by \citet{Hu2023}, is proposed to estimate the multivariate \ac{PSD} for correlated \ac{ET} noise. As a development within the broader framework of variational inference (VI), SGVB optimizes a surrogate posterior distribution by minimizing the \ac{KL} divergence from the true posterior distribution~\cite{Jordan1999,Wainwright2008,Blei2017}.  
 This method transforms complex posterior sampling into an optimization problem, enhancing sampling efficiency and reducing computational demands~\cite{Blei2006,kingma2022}.
 Recent advances in VI, such as normalizing flows, have demonstrated its effectiveness for pulsar timing-array datasets~\cite{Vallisneri2024}. 
 
-
-%% Duplicated below
-% The SGVB approach is applied to simulated ET noise, demonstrating its flexibility and applicability to other detectors like LISA and the LIGO-Virgo-KAGRA (LVK) network. A blocked Whittle likelihood approximation is introduced to manage large time series \citep{vu2024}.
-% Guidance on SGVB tuning parameters, such as learning rates and basis functions, is provided. 
-% In addition, the coherence is computed as a function of frequency, quantifying correlations in the multivariate time series.
 
 In this article, we demonstrate the usefulness and flexibility of a SGVB approach to estimate the spectral density matrix of the correlated instrumental noise from a  network of \ac{GW} detectors.
 In particular, the approach is illustrated by using simulated ET noise and is also readily applicable to estimate  \ac{LISA} instrumental noise or correlated \ac{LVK} noise induced by magnetic noise such as from the Schumann resonances~\cite{Thrane_correlations_SGWB}.
@@ -158,6 +153,9 @@ Lastly, the article concludes with a summary of findings in Section~\ref{sec:Dis
 \label{sec:method}
 
 \subsection{Likelihood}
+
+\avi{State we are using two sided FFT}
+
 Assume we are given a time series of gravitational wave observations of length $n$ from $p$ channels. To set notation, 
 let $\Z=(\Z_1,\ldots,\Z_n)^ \intercal\in  \mathbb{R}^{n\times p}$ be a $p$-dimensional stationary, mean-zero time series, sampled at time intervals $\Delta_t=1/(2f_{Ny})$, where $f_{Ny}$ is the Nyquist frequency, for a total observation time of $T$ with a total of $n=T/\Delta_t$ sampled values for each of the $p$ dimensions. The frequency resolution, \(\Delta_f\), is given by\[\Delta_f = \frac{1}{n \Delta_t} = \frac{1}{T}.\] Let $\d_k$ be the \ac{DFT} of $\Z$ given by
 \begin{align*}
@@ -253,38 +251,25 @@ The goal of the variational approach is to identify the parameters $\phi_j=(\mu_
   &=& \operatorname*{argmin_{\phi_j}} \int \log\frac{q_{\phi_j}(\bnu_j)}{p_j(\bnu_j|\d_j)}q_{\phi_j}(\bnu_j) d\bnu_j\, .
 \end{eqnarray}
 The optimization algorithm employed in this work uses a SGVB approach, as described by \citet{kingma2022,Xu2019,Domke2019}. \smallskip
-
-
-% \ac{VI} is often computationally faster because the optimization process converges more quickly than generating a large number of posterior samples using Markov chain Monte Carlo methods.
  
 
 \paragraph{Choice of the Number of Basis Functions:} 
 
 
 The variation of parameters ($\log \delta^2_{jk},\Re(\theta^{(k)}_{j\cdot}),\Im(\theta^{(k)}_{j\cdot})$) across frequencies $f_k$ is modeled using $M$ truncated smoothing splines. 
-The choice of $M$ is critical: if $M$ is set too low, underfitting may occur, while an excessively large $M$ can lead to overfitting and increased computational complexity due to the higher dimensionality of $\phi_j$. Despite concerns about overfitting when $M$ is large, the use of a horseshoe prior on the coefficients serves as a regularization mechanism, effectively mitigating the risk of overfitting~\citep{10.1214/17-EJS1337SI}.
+Choosing an appropriate $M$ is crucial: a low $M$ may cause underfitting, while a high $M$ can lead to overfitting and increased computational complexity due to the higher dimensionality of $\phi_j$. To address overfitting concerns, a horseshoe prior on the coefficients acts as a regularization mechanism, effectively reducing the risk of overfitting~\citep{10.1214/17-EJS1337SI}.
 
-%\avi{Kate will take a crack as this paragraph}
-The likelihood function (Equation~\ref{eq:likelihoodj}) measures the consistency of the data with the spectral density, parameterized by $(\log \delta^2_{jk}, \Re(\theta^{(k)}_{j\cdot}), \Im(\theta^{(k)}_{j\cdot}))$. We use the likelihood at the maximum likelihood estimate (MLE) to choose $M$. The likelihood at MLE tends to rise with $M$, reflecting an improvement in model fit as the model complexity increases. When $M$ is sufficiently large, it tends to be stabilized or increase steadily. We chose $M$ to prevent underfitting conservatively by a slightly larger value than the value where the likelihood is stabilized.
-
-
-
-%It is crucial to keep $M$ below 50\% of the sample size $n$ to avoid overfitting\footnote{This upper limit ($M \lesssim n/2$) is empirically determined and can be adjusted if necessary.}. 
-
-%\avi{add note on the prior helping prevent overfitting}
-
-% \jliu{As the number of basis functions $M$ increases, the maximum likelihood estimate (MLE) initially rises sharply, reflecting a substantial improvement in model fit as the model complexity increases. However, as $M$ continues to increase, the MLE exhibits a more gradual and steady rise, indicating that while the model is still improving, the rate of improvement has slowed as it captures the underlying structure of the data. Once $M$ reaches a sufficiently large value where the improvements become marginal, further increases in $M$ lead to fluctuations in the MLE, suggesting that the model is starting to overfit, with the added complexity introducing bias rather than improving the fit}. \jliu{When M continues to increase, the trend of MLE will be disturbed, so a large M will have a bias on the value of MLE. This phenomenon can be found on page 33 of Google doc} 
-
-
-
-
+The likelihood function (Equation~\ref{eq:likelihoodj}) measures the consistency of the data with the spectral density, parameterized by $(\log \delta^2_{jk}, \Re(\theta^{(k)}_{j\cdot}), \Im(\theta^{(k)}_{j\cdot}))$. 
+We use the likelihood in the maximum likelihood estimate (MLE) to choose $M$. 
+The likelihood at MLE tends to increase with $M$, reflecting an improvement in model fit as the model complexity increases. 
+When $M$ is sufficiently large, the likelihood tends to stabilize or increase steadily. 
+We chose $M$ to prevent underfitting by conservatively selecting a slightly larger $M$ than the point where the likelihood stabilizes.
 
 
 
 
 \smallskip
 
-%\RM{In addition to showing the log-likelihood values for increasing number of basis functions, does this also affect the smoothness of the psd estimate? I expect more wiggly curves with larger $M$, smoother curves with low $M$. Or won't we see that effect because of the penalization by the prior?}
 
 
 \paragraph{Optimization of the Learning Rate:}\label{subsec:learningrate}
@@ -302,15 +287,15 @@ The SGVB approach is used to estimate $\phi^*_j$, $j=1,...,p$ and it consists of
 
 The performance of each maximizer depends on the learning rate; if the learning rate is too small or too large, the optimization algorithm may get stuck at a local maximum or take too long to find the global maximum. 
 Thus, choosing the optimal learning rate is crucial.
-While \citet{Hu2023} selected a specific but arbitrary value for the learning rate, this study proposes  a method to select the optimal learning rate and automate the selection procedure.
+While \citet{Hu2023} selected a specific but arbitrary value for the learning rate, this study proposes a method to select the optimal learning rate and automate the selection procedure.
 
-Let $\tau_1$ and $\tau_2$ be the learning rates associated with the first and second steps. 
-A broad range of plausible values for $\tau_2$ is found, rendering it unnecessary to be altered from \citet{Hu2023}'s default settings. 
+Let $\tau_1$ and $\tau_2$ be the learning rates associated with the first and second steps, respectively. 
+As $\tau_2$ has a broad range of plausible values, it is unnecessary to deviate from the default settings proposed by \citet{Hu2023}. 
 An appropriate $\tau_1$ is obtained by maximizing the ELBO 
 \begin{equation}
 \tau_1^* = \operatorname*{argmax_{\tau_1}} \prod^p_{j=1}\text{ELBO}(q_{\phi_j}, p_j(\boldsymbol{\nu}_j|\mathbf{d}_j)) \,.    
 \end{equation}
-This optimisation is conducted over a continuous parameter space using the Python package \hyperopt~\cite{Bergstra2013} and the tree-structured Parzen Estimator (TPE) algorithm~\cite{Bergstra2011}. 
+This optimization is carried out over a continuous parameter space using the Python package \hyperopt~\cite{Bergstra2013} and the tree-structured Parzen Estimator (TPE) algorithm~\cite{Bergstra2011}. 
 From our preliminary study, the optimal learning rates coincide with the learning rates optimized jointly. 
 The maximum number of iterations for the optimisation procedure is set to \num{10 000}. 
 
@@ -332,12 +317,13 @@ where $\S_{xy}(f_k)$ is the cross-spectral density between components $x$ and $y
 \label{sec:simulation}
 
 In order to test the efficiency and accuracy of SGVB, 500 independent realisations of a bivariate time series are generated from a vector autoregressive model of order 2 (VAR(2)) and a vector moving-average model of order 1 (VMA(1)), using three  different sample sizes $n=256,512,1024$ (refer to \citet[Section~4.2,][]{Liu2023} for the definitions of the VAR(2) and VMA(1) models). 
-The spectral densities are estimated by using both the \ac{SGVB} method and \citet{Liu2023}'s vectorized nonparametrically corrected method (VNPC), an MCMC-based approach that samples from the exact posterior distribution without a variational approximation\footnote{For the VNPC analyses, we use the software and settings provided by \citet{Liu2023}, specific for the VAR(2) and VMA(1) models.}.
+The spectral densities are estimated using both the \ac{SGVB} method and \citet{Liu2023}'s vectorized nonparametrically corrected method (VNPC), an MCMC-based approach that samples from the exact posterior distribution without a variational approximation\footnote{For the VNPC analyses, we use the software and settings provided by \citet{Liu2023}, specific for the VAR(2) and VMA(1) models.}.
 
 In order to avoid underfitting in SGVB, an appropriate number of basis functions is determined for each dataset using the method discussed in Section~\ref{subsec:sgvb_details}. 
-Figure~\ref{fig:sim_basis} shows the log MLE (normalised for comparison between datasets) plotted against the number of basis functions.
-$M=30$ is set as the log MLE enters a steady ascent phase and before any perturbations appear, thereby avoiding both underfitting across the three different dataset sizes. \kl{You can comment on the blue line something like this. When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$, and this is clearly a sign of overfitting; the number of parameters ($(M+1)4$ for bivariate time series) exceeds the number of data points.}  
-\avi{Say somthing about $n=256$, M increases but we select a lower region becasue overfitting, i think we're selecting}\jliu{what does the $(M+1)4$ mean?}.
+Figure~\ref{fig:sim_basis} shows the log MLE (normalized for comparison between datasets) plotted against the number of basis functions.
+$M=30$ is set as the log MLE enters a steady ascent phase and before any perturbations appear, thereby avoiding both underfitting across the three different dataset sizes. 
+When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$ due to overfitting; the number of parameters ($(M+1)4$ for bivariate time series) exceeds the number of data points.  
+\jliu{what does the $(M+1)4$ mean?}
 
 
 \begin{figure}
@@ -480,13 +466,13 @@ Additionally, the squared coherences are plotted for the cases in Figure~\ref{fi
   \caption{Case B and C PSDs}
   \label{fig:caseBC_psd}
 \end{subfigure}
-\caption{Spectral density estimates for three cases of ET noise data. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% CI shaded) and the true PSD (black curve in the diagonals).}
+\caption{Spectral density estimates for three cases of ET noise data. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals).}
 \label{fig:ET_PSDS}
 \end{figure*}
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{caseAB_coh.pdf}
-  \caption{Squared coherence estimation for any pair of channels in cases A (top) and B (bottom). The solid curves represent the median estimated squared coherences, while the shaded areas indicate the corresponding 90\% CI. The black dashed line is the true coherence (zero in case B).}
+  \caption{Squared coherence estimation for any pair of channels in cases A (top) and B (bottom). The solid curves represent the median estimated squared coherences, while the shaded areas indicate the corresponding 90\% credible interval. The black dashed line is the true coherence (zero in case B).}
   \label{fig:squared_coh}
 \end{figure}
 
@@ -512,13 +498,15 @@ This result aligns with theoretical expectations for uncorrelated channels,  pro
 \avi{Kamiel to add some more motivation on Case C}
 
 These findings collectively demonstrate the capability of this spectral estimation technique to characterize both the individual channel spectra and the inter-channel correlations across various noise scenarios. 
-% The ability to discern subtle correlations, as seen in Case B, highlights the potential for detecting weak inter-channel relationships in real ET data. 
+
 Furthermore, the clear differentiation between the correlated (Case A), minimally correlated (Case B), and uncorrelated (Case C) scenarios validates the robustness of our analytical approach.
 
 \section{Conclusions}
 \label{sec:Discussion}
-Several papers have pointed out the importance of taking correlated interferometer network noise into account when estimating the parameters of gravitational wave signals observed by ground-based detectors such as ET or space-based detectors such as LISA. However, so far, no statistical methodology has been suggested to estimate the multivariate noise spectral density of a detector network.
-In this study, we propose a computationally efficient variational Bayesian approach for estimating the spectral density of multivariate time series. It is important to note that this technique does not assume any restrictive parametric form of the spectral density, allowing it to adapt to any shape of the PSD.
+Recent work has pointed out the importance of taking into account correlated interferometer network noise when estimating the parameters of gravitational wave signals observed by ground-based detectors such as ET or space-based detectors such as LISA~\cite{x,y,z}. 
+However, so far, no statistical methodology has been suggested to estimate the multivariate noise spectral density of a detector network.
+In this study, we propose a computationally efficient variational Bayesian approach for estimating the spectral density of multivariate time series. 
+It is important to note that this technique does not assume any restrictive parametric form of the spectral density, allowing it to adapt to any shape of the PSD.
 To handle the large length of GW network measurements, we use a blocked Whittle likelihood. 
 We provide a hyperparameter optimization method and guidelines to tune the settings of the method. 
 Simulation studies presented for VAR(2) and VMA(1) demonstrate that our approach achieves accuracy comparable to MCMC while significantly reducing computation time, although with potentially narrower credible intervals.
@@ -536,30 +524,11 @@ Further investigations could examine the implications of these spectral characte
 In conclusion, the variational Bayes approach offers a promising tool for spectral density estimation in GW data analysis, combining accuracy with computational efficiency. This method has the potential to enhance our ability to characterize detector noise and ultimately improve GW detection capabilities.
 
 
-\avi{highlight flexibility of technique, can take on any shape of the PSD, unlike a parametric approach. }
-
-
-
-
-
-% \begin{itemize}
-%     \item demonstrated nonparametric methods to estimate correlated noise in ET (or LISA) data that can handle long time series 
-%     \item in future: simultaneous estimation of SGWB and noise
-%     \item hyperparameter optimization, adaptive learning rates
-% \end{itemize}
-
-
-
-% During the \ac{ET} era, managing correlated noise will be essential for maximising \ac{ET} scientific capabilities~\cite{Cireddu:2023:arXiv}.
-% We demonstrate a VI method for estimating a multivariate PSD for a \ac{GW} interferometer network under the influence of correlated noise and demonstrate how to quantify coherence. 
-% We demonstrate how the coherence changes as the noise correlation is adjusted. 
-% Future efforts will evaluate the impact of \ac{PE} for a compact-binary coalescence \ac{GW} signal in correlated noise, using a multivariate PSD and independent PSDs. 
-% Additional work will explore the automation of hyper-parameter optimisation to tune the \ac{VI} parameters. 
 
 
 \section*{Data and Software Availability}
 The software developed for this research is available on GitHub (\url{https://github.com/nz-gravity/sgvb_psd}) under the MIT License. 
-The specific version used in this study has been archived on Zenodo~\cite{}. 
+The specific version used in this study has been archived on Zenodo~\citeme. 
 Documentation and examples for the software can be found at \url{https://nz-gravity.github.io/sgvb_psd/}.
 All data products are available in the project's OSF repository (https://doi.org/10.17605/OSF.IO/ABCDE)\cite{}.
 \avi{Jianan we have to finish up the examples, tag and pin a version in zenodo, put data on OSF}
@@ -590,42 +559,4 @@ support.
 
 \bibliography{reference}
 
-
-
-
-% \clearpage
-% \appendix  
-
-% \section{Accuracy of the blocked  Whittle likelihood}
-% \label{appdx:blocked_lnl}
-
-
-% We generate 50 independent realizations of the VAR(2) model, each with a length of \(2^{17}\). 
-% For each realization, the traditional log Whittle likelihood (Equation~\ref{eq:Whittle likelihood}) is calculated by using the entire dataset. 
-% Subsequently, each dataset is partitioned into varying numbers of blocks to compute the blocked log Whittle likelihood (Equation~\ref{eq:block_lnl}) for each configuration. 
-% The median and 90\% credible interval blocked log likelihood is then determined across the 50 realizations for each block configuration.
-
-% Figure~\ref{fig:lnl_vs_nchunks} illustrates the inverse relationship between the number of blocks and the error of the blocked likelihood, relative to the traditional Whittle likelihood (one block). 
-% As the number of blocks increases, the relative error consistently increases.
-
-% \begin{figure}
-%   \includegraphics[width=\columnwidth]{relative_error_vs_nchunks}
-%   \caption{Relative error of the \avi{log(?)} Blocked Whittle likelihood as a function of the number and length of blocks utilised. The solid green curve represent the median values, while the shaded areas indicate the corresponding 90\% credible interval.}
-%   \label{fig:lnl_vs_nchunks}
-% \end{figure}
-
-% Even though partitioning the data into blocks can dramatically reduce the computational cost, a high number of blocks implies a lower number of observations per block, reducing the information on overall spectral characteristics and potentially losing long-range correlations and low-frequency information. 
-% More blocks introduce additional boundaries, creating discontinuities that may lead to spectral leakage and reduced accuracy in spectral density estimation. 
-% Furthermore, smaller block sizes decrease the frequency resolution, potentially missing fine spectral features.
-
-
-
-
-%This trend highlights the need for an optimal balance between computational efficiency (favoring more blocks) and estimation accuracy (favoring fewer blocks). This trade-off is crucial in gravitational wave data analysis, where both speed and precision are essential. \pmr{What is the advise?}
-%Since the relative error varies across datasets, we recommend examining the relative error as the number of blocks increases and selecting a block size where the error approaches zero. 
-
-
-
 \end{document}
-%
-% ****** End of file apssamp.tex ******
