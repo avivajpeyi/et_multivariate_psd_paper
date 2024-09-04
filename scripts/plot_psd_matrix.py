@@ -278,6 +278,69 @@ THICKNESS = 2
 LABELS = ['X', 'Y', 'Z']
 TRUE_STYLE = dict(color='k', lw=0.8, ls="-", alpha=0.6)
 
+
+def load_posterior_matrix(matrix_file_path):
+    # estimated psd (median, lower, upper)
+    with h5py.File(matrix_file_path, 'r') as f:
+        spec_mat_median = f['ETnoise_correlated_GP_spec_mat_median_XYZ'][:]
+        spec_mat_lower = f['ETnoise_correlated_GP_spec_mat_lower_XYZ'][:]
+        spec_mat_upper = f['ETnoise_correlated_GP_spec_mat_upper_XYZ'][:]
+    return spec_mat_median, spec_mat_lower, spec_mat_upper
+
+def load_raw_data(channel_pth):
+    channels = []
+    for i, c in enumerate('XYZ'):
+        with h5py.File(channel_pth.format(c), 'r') as f:
+            channels.append(f[f'E{i + 1}:STRAIN'][:])
+    channels = np.column_stack(channels)
+    return channels
+
+def load_true_psd():
+    # upload the true psd data
+    file_path = f'{paths.data}/ET(1).txt'
+    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak10Hz_new.txt'
+    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak50Hz_new.txt'
+    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    file_path = f'{paths.data}/Peak90Hz_new.txt'
+    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+
+    x_channel_real = ((ET_1[:, 1] ** 2 + Peak10Hz[:, 1] ** 2 + Peak50Hz[:, 1] ** 2)) / 2
+    y_channel_real = ((ET_1[:, 1] ** 2 + Peak10Hz[:, 1] ** 2 + Peak90Hz[:, 1] ** 2)) / 2
+    z_channel_real = ((ET_1[:, 1] ** 2 + Peak50Hz[:, 1] ** 2 + Peak90Hz[:, 1] ** 2)) / 2
+
+    return ET_1, x_channel_real, y_channel_real, z_channel_real
+
+def load_freq():
+    q = 10 ** 22 / 1.0
+    time_interval = 2000
+    nchunks = 125
+    required_part = 128
+
+    channel_pth = str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5"
+    channels = load_raw_data(channel_pth)
+    Ts = 1 / (channels.shape[0] / time_interval)
+    freq_original = np.fft.fftfreq(int(np.size(channels, 0) / nchunks), Ts)
+
+    n = int(np.size(channels, 0) / nchunks)
+    if np.mod(n, 2) == 0:
+        # n is even
+        freq_original = freq_original[0:int((n / 2))]
+    else:
+        # n is odd
+        freq_original = freq_original[0:int((n - 1) / 2)]
+
+    total_len = channels.shape[0]
+    freq_range = total_len / time_interval / 2
+    freq = freq_original[0:int(required_part / freq_range * freq_original.shape[0])]
+    norm_factor = (q) ** 2 / (freq_original[-1] / 0.5)
+    return freq, freq_original, norm_factor
+
+
 def plot_et_matrix(
         channel_pth,
         matrix_file_path,
@@ -362,7 +425,8 @@ def plot_et_matrix(
                                         spec_mat_upper[..., i, i] / (q) ** 2 / (freq_original[-1] / 0.5),
                                         color=psd_col, alpha=PSD_FILL_ALPHA)
 
-                axes[i, j].text(0.95, 0.95, r'$f_{{{}, {}}}$'.format(i + 1, i + 1), transform=axes[i, j].transAxes,
+                CHANELS = 'XYZ'
+                axes[i, j].text(0.95, 0.95, '$\mathcal{S}_' +'{{{}, {}}}$'.format(CHANELS[i], CHANELS[i]), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
 
                 axes[i, j].set_xlim([5, 128])
@@ -494,7 +558,15 @@ def main():
         psd_col="C0",
         label="Case A PSD"
     )
+    axes[0,0].get_figure().savefig(f'{paths.figures}/caseA_psd.pdf')
 
+
+    axes = plot_et_matrix(
+        channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
+        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
+        psd_col="C0",
+        label="Case A PSD"
+    )
     axes = plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
         matrix_file_path=f'{paths.data}/ETnoise_no_cross_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
