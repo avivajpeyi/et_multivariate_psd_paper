@@ -161,7 +161,8 @@ let $\Z=(\Z_1,\ldots,\Z_n)^ \intercal\in  \mathbb{R}^{n\times p}$ be a $p$-dimen
 \begin{align*}
 \d(f_k) = \Delta_t\sum_{t=1}^{n} \Z_t\exp \left(-2\pi i \frac{k}{n} t \right)\, ,
 \end{align*}
-where $f_k= k \Delta_f= k/{n\Delta_t})=k /{T}$ for $k=1,\ldots, N$, where $N = n/2$ if n is even, $N = (n-1)/2$ if n is odd.
+where $f_k= k \Delta_f= k/{n\Delta_t})=k /{T}$ for $k=1,\ldots, N$, where $N = n/2$ if n is even, $N = (n-1)/2$ if n is odd. In this analysis, we use the two-sided Fourior transform, which includes both positive and negative frequencies, allowing for a full representation of the frequency spectrum. However, for the purposes of this study, we only retain the positive frequency components.
+
 
 Due to the normalizing and decorrelating properties of the Fourier transform, the discrete Fourier coefficients $\d(f_k)$ (multiplied by $1 / \sqrt{n}$) are asymptotically independent and have a complex Gaussian distribution with covariance matrix given by the spectral density matrix $\S(f_k)$,  the Fourier transform of the autocovariance function. This asymptotic Gaussian distribution is the basis of the multivariate Whittle likelihood approximation in the frequency domain, expressed as
 \begin{align}\label{eq:Whittle likelihood}
@@ -337,18 +338,22 @@ When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$ due t
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\columnwidth]{sim_error_violins.pdf}
-  \captionof{figure}{
-  Comparison of VNPC and SGVB methods for VAR(2) and VMA(1) models for different data lengths $n$. (a,b) Violin plots of $L_2$ errors from 500 realizations for VAR(2) and VMA(1) models respectively. (c) Speed-up factor of SGVB compared to VNPC. The SGVB method uses optimized values for $M$ and $\tau_1$.}
+  \includegraphics[width=0.9\columnwidth]{sim_l2error_violins.pdf}
+  \captionof{figure}{Violin plots of VNPC and SGVB $L_2$ errors from 500 realizations for VAR(2) and VMA(1) models, for different data lengths $n$. The SGVB method uses optimized values for $M$ and $\tau_1$.}
   \label{fig:sim_error_violins}
 \end{figure}
 
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\columnwidth]{sim_speed_violins.pdf}
+  \captionof{figure}{Violin plots of the speed up gained by using SGVB compared to VNPC from 500 realizations for VAR(2) and VMA(1) models, for different data lengths $n$. The SGVB method uses optimized values for $M$ and $\tau_1$.}
+  \label{fig:sim_speed_violins}
+\end{figure}
+
 Given an estimated spectral density matrix $\hat{\bm{f}}$ and the true spectral density matrix $\bm{f}_0$, the accuracy of PSD estimates can be assessed using the $L_2$ error. The $L_2$ error provides a quantitative measure of the discrepancy between  $\hat{\bm{f}}$ and $\bm{f}_0$, encapsulating the overall difference between the estimated and true spectral density matrices across the frequency range. 
 A smaller $L_2$ error indicates that $\hat{\bm{f}}$ closely approximates $\bm{f}_0$, while a larger $L_2$ error reflects greater deviation.
 The $L_2$ error can be approximated as
-% \begin{eqnarray*}
-% ||\hat{\bm{f}} - \bm{f}_0||_{L_2} &=& %\left(\int_{0}^{0.5} ||\hat{\bm{f}}_0(f_K) - \bm{f}_0(f_K)||^2 d\nu \right)^{\frac{1}{2}} \\
 \begin{equation}
  ||\hat{\bm{f}} - \bm{f}_0||_{L_2}  \approx \left(\frac{1}{N} \sum_{k=1}^{N}||\hat{\bm{f}}_0(f_k)-\bm{f}_0(f_k)||^2 \right)^{1/2}\, ,
 \end{equation}
@@ -357,17 +362,19 @@ where $\Vert \cdot \Vert$ denotes the Frobenius norm, which  for a complex $p\ti
 \Vert \A\Vert= \sqrt{\sum_{i,j} |a_{ij}|^2}\, .
 \end{equation}
 
-Figure~\ref{fig:sim_error_violins} (a and b) displays the $L_2$ error distributions from both the SGVB and VNPC methods across the different sample sizes. 
-The $L_2$ errors are calculated by using the estimated spectral densities and the true spectral densities of the VAR(2) simulations (shown in panel a) and the VMA(1) simulations (shown in panel b), respectively.
-Figure~\ref{fig:sim_error_violins} c) displays the speed-up factor of the SGVB compared to the VNPC method. 
+Figure~\ref{fig:sim_error_violins} displays the $L_2$ error distributions from both the SGVB and VNPC methods across the different sample sizes. 
+The $L_2$ errors are calculated by using the estimated spectral densities and the true spectral densities of the VAR(2) simulations (top panel) and the VMA(1) simulations (bottom panel), respectively.
+
+
+Figure~\ref{fig:sim_speed_violins} displays the speed-up factor of the SGVB compared to the VNPC method. 
 Additionally, Table~\ref{table:simstudy} presents the simulation study's median $L_2$ errors, pointwise coverage, and median width of pointwise 90\% credible regions, as well as the median computation time (in seconds)\footnote{Pointwise coverage is defined as the proportion of times the true spectral density value at each frequency is captured within the confidence interval across different realizations of the data.}. 
 
 
 \input{table3}
 
 
-Figure~\ref{fig:sim_error_violins} reveals that as the sample size increases, both methods achieve lower median $L_2$ errors, and  the median $L_2$ errors are similar between the two methods. 
-However, the median speed-up factor for SGVB becomes increasingly pronounced, ultimately surpassing VNPC by more than 50 times. 
+Figure~\ref{fig:sim_error_violins} reveals that as the sample size increases, both methods achieve lower median $L_2$ errors, and the median $L_2$ errors are similar between the two methods. 
+Additionlly, Figure~\ref{fig:sim_speed_violins} shows the median speed-up factor for SGVB becomes increasingly pronounced, ultimately surpassing VNPC by more than 50 times, as $n$ is increased. 
 Notably, when $n=1024$, SGVB's accuracy is only marginally lower than VNPC's, yet it reduces median computation time by a factor of approximately 50. 
 The simulation study provides empirical evidence for the consistency of the SGVB approach, demonstrating that as sample size grows, the posterior distributions contracts around the true spectral density, following the same trend as the VNPC approach. 
 
@@ -440,9 +447,9 @@ Three analyses are performed to estimate the power spectral density (PSD) and th
     \item[] \textbf{Case C:} ET noise with uncorrelated Gaussian peaks, assuming independence between channels.
 \end{itemize}
 
-For computational efficiency the data is divided into 125 equal blocks, each comprising \SI{32738} data point.
+
+Given that the Gaussian peaks are concentrated within the first \SI{128}{Hz}, the data is divided into 125 equal blocks, each comprising \SI{32738} data point, and a frequency resolution of 2048 points.
 Each block is Fourier transformed, generating the 125 blocks of input data (each consisting of \num{16 384} points) for the blocked Whittle likelihood estimation (Equation~\ref{eq:block_lnl}). 
-\avi{state that we choose this to get a freq resolution size of X.} \jliu{Given that all Gaussian peaks across the channels are concentrated within the first 128 Hz, only the data corresponding to these frequencies is extracted from each block, resulting in a frequency resolution of 2048 points.}
 Each Whittle likelihood block uses identical basis function expressions defined in Section~\ref{subsec: parameters} for the spectral density matrix. 
 
 Figure~\ref{et_corr_basis_funs_vs_mle} displays the log maximum
@@ -451,24 +458,41 @@ As the log MLE stabilizes around $M\sim400$, we set $M=450$.
 Using the methodology discussed in Section~\ref{sec:method}, the PSDs for each case are estimated and plotted in Figure~\ref{fig:ET_PSDS}. For each case, the diagonal subplots represent the spectral densities for X, Y and Z channels. Since the off-diagonal elements of the PSD matrix at each frequency are complex numbers, with the elements above the diagonal being the conjugates of those below, we plot the real part of the off-diagonal elements in the upper subplot and the imaginary part in the lower subplot.
 Additionally, the squared coherences are plotted for the cases in Figure~\ref{fig:squared_coh}. The plot shows the squared coherences estimation between any pair of channels for case A and case B.
 
-\begin{figure*}[]
+
+\begin{figure*}
 \centering
-\begin{subfigure}{\columnwidth}
-  \centering
-  \includegraphics[width=1.05\columnwidth]{caseA_psd.pdf}
-  \caption{Case A PSD}
-  \label{fig:caseA_psd}
-\end{subfigure}
-\hfill
-\begin{subfigure}{\columnwidth}
-  \centering
-  \includegraphics[width=1.05\columnwidth]{caseBC_psd.pdf}
-  \caption{Case B and C PSDs}
-  \label{fig:caseBC_psd}
-\end{subfigure}
-\caption{Spectral density estimates for three cases of ET noise data. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals).}
-\label{fig:ET_PSDS}
+\includegraphics[width=\textwidth]{caseA_psd.pdf}
+\caption{Case A PSD. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the \avi{jianan fill out}, while the lower triangle subplots show \avi{jianan fill out.}}
+\label{fig:caseA_psd}
 \end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{caseBC_psd.pdf}
+\caption{Case B and C PSDs. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the \avi{jianan fill out}, while the lower triangle subplots show \avi{jianan fill out.}}
+\label{fig:caseBC_psd}
+\end{figure*}
+
+
+% SIDE BY SIDE VERSION
+% \begin{figure*}[]
+% \centering
+% \begin{subfigure}{\columnwidth}
+%   \centering
+%   \includegraphics[width=1.05\columnwidth]{caseA_psd.pdf}
+%   \caption{Case A PSD}
+%   \label{fig:caseA_psd}
+% \end{subfigure}
+% \hfill
+% \begin{subfigure}{\columnwidth}
+%   \centering
+%   \includegraphics[width=1.05\columnwidth]{caseBC_psd.pdf}
+%   \caption{Case B and C PSDs}
+%   \label{fig:caseBC_psd}
+% \end{subfigure}
+% \caption{Spectral density estimates for three cases of ET noise data. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals).}
+% \label{fig:ET_PSDS}
+% \end{figure*}
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{caseAB_coh.pdf}
@@ -488,7 +512,8 @@ The median estimates for the squared coherence aligns with the true coherence, d
 Case B, which considers ET noise data with nominally uncorrelated noise, reveals, despite the absence of deliberately injected correlations, minor fluctuations in the off-diagonal subplots representing the real and imaginary parts of the estimated spectral densities.
 These fluctuations manifest as small ($C_{xy}\lesssim0.02)$, near-zero coherence values in the corresponding squared coherence plots. 
 This observation is consistent with theoretical expectations: for a time series segmented into $N_b$ blocks, the coherence is expected to be approximately $1/N_b$~\citeme. 
-The small non-zero coherence values observed in our analysis likely reflect this statistical phenomenon rather than any genuine correlation between the channels.
+\avi{kamiel to discuss a bit about the expected coherence -- is it an issue that our estimate does not contain the true?}
+% The small non-zero coherence values observed in our analysis likely reflect this statistical phenomenon rather than any genuine correlation between the channels.
 
 In case C, where the three channels are assumed independent, the estimated spectral densities yield zero off-diagonal (the XY, YZ, ZX components) PSD estimates. 
 Consequently, the squared coherence between any pair of channels is uniformly zero across all frequencies. 
@@ -499,7 +524,7 @@ This result aligns with theoretical expectations for uncorrelated channels,  pro
 
 These findings collectively demonstrate the capability of this spectral estimation technique to characterize both the individual channel spectra and the inter-channel correlations across various noise scenarios. 
 
-Furthermore, the clear differentiation between the correlated (Case A), minimally correlated (Case B), and uncorrelated (Case C) scenarios validates the robustness of our analytical approach.
+Furthermore, the clear differentiation between the correlated (case A), minimally correlated (case B), and uncorrelated (case C) scenarios validates the robustness of our analytical approach.
 
 \section{Conclusions}
 \label{sec:Discussion}
