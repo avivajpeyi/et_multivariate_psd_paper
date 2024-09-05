@@ -56,16 +56,29 @@ def plot_Sxx_ratio(ax, case, color):
     true_f, true_sxx = load_true_Sxx()
     # interpolate the true S_xx to match f of the estimated S_xx
     true_sxx = interp.interp1d(true_f, true_sxx, kind='cubic', bounds_error=False, fill_value='extrapolate')(f)
-    ratio = np.exp(np.log(sxx) - np.log(true_sxx))
-    ax.plot(f, ratio[1], color=color, label=f"Case {case}")
-    ax.fill_between(f, ratio[0], ratio[2], color=color, alpha=0.3, lw=0)
+
+    # # compute absolute error at each frequency
+    # error  = np.array([
+    #     np.abs(sxx[0] - true_sxx),
+    #     np.abs(sxx[1] - true_sxx),
+    #     np.abs(sxx[2] - true_sxx)
+    # ])
+    # ax.plot(f, error[1], color=color, label=f"Case {case}")
+    # ax.fill_between(f, error[0], error[2], color=color, alpha=0.3, lw=0)
+    # ax.set_ylabel('Absolute Error')
+    # ax.set_xlabel('Frequency [Hz]')
+
+
+    # ratio = np.exp(np.log(sxx) - np.log(true_sxx))
+    # ax.plot(f, ratio[1], color=color, label=f"Case {case}")
+    # ax.fill_between(f, ratio[0], ratio[2], color=color, alpha=0.3, lw=0)
     #
     #
 
     # TODO: jianan -- i think the scaling is different...
-    # ax.plot(f,sxx[1], color=color)
-    # ax.fill_between(f, sxx[0], sxx[2], color=color, alpha=0.3, lw=0)
-    # ax.plot(f,true_sxx, color='k', label=case)
+    ax.plot(f,sxx[1], color=color)
+    ax.fill_between(f, sxx[0], sxx[2], color=color, alpha=0.3, lw=0)
+    ax.plot(f,true_sxx, color='k', label=case)
 
 
     ax.set_xlim([5, 128])
