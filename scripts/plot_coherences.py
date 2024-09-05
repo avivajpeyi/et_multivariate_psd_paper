@@ -115,7 +115,7 @@ def main():
 
     legend = axes[0].legend(
         handles=[
-            plt.Line2D([0], [0], color='k',  label='True'),
+            plt.Line2D([0], [0], color='k', ls='dotted', label='Expected'),
             plt.Line2D([0], [0], color='C0', label='XY'),
             plt.Line2D([0], [0], color='C1', label='XZ'),
             plt.Line2D([0], [0], color='C2', label='YZ'),
@@ -125,7 +125,7 @@ def main():
         fontsize='small',
         labelspacing=0.05, columnspacing=0.25,
     )
-    for handle in legend.legend_handles:
+    for handle in legend.get_lines():
         handle.set_linewidth(3)
 
 

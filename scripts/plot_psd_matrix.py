@@ -409,8 +409,8 @@ def plot_et_matrix(
     for i in range(3):
         for j in range(3):
 
-            axes[i, j].text(0.05, 0.95, f"{LABELS[i]}{LABELS[j]}", transform=axes[i, j].transAxes,
-                            horizontalalignment='left', verticalalignment='top', fontsize=14)
+            #axes[i, j].text(0.05, 0.95, f"{LABELS[i]}{LABELS[j]}", transform=axes[i, j].transAxes,
+            #                horizontalalignment='left', verticalalignment='top', fontsize=14)
 
 
             if i == j:
@@ -426,7 +426,7 @@ def plot_et_matrix(
                                         color=psd_col, alpha=PSD_FILL_ALPHA)
 
                 CHANELS = 'XYZ'
-                axes[i, j].text(0.95, 0.95, '$\mathcal{S}_' +'{{{}, {}}}$'.format(CHANELS[i], CHANELS[i]), transform=axes[i, j].transAxes,
+                axes[i, j].text(0.95, 0.95, '$\mathbf{S}_' +'{{{} {}}}$'.format(CHANELS[i], CHANELS[i]), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
 
                 axes[i, j].set_xlim([5, 128])
@@ -465,7 +465,8 @@ def plot_et_matrix(
                 axes[i, j].plot(f, np.real(cross_spectrum_fij) / (freq_original[-1] / 0.5),
                                 marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
-                axes[i, j].text(0.95, 0.95, r'$\Re(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
+                
+                axes[i, j].text(0.95, 0.95, '$\Re('+'\mathbf{S}_' +'{{{} {}}})$'.format(CHANELS[i], CHANELS[j]), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
 
                 axes[i, j].set_xlim([5, 128])
@@ -494,7 +495,7 @@ def plot_et_matrix(
                 axes[i, j].plot(f, np.imag(cross_spectrum_fij) / (freq_original[-1] / 0.5),
                                 marker='', markersize=0, linestyle='-', color='lightgray', alpha=0.3, zorder=-10)
 
-                axes[i, j].text(0.95, 0.95, r'$\Im(f_{{{}, {}}})$'.format(i + 1, j + 1), transform=axes[i, j].transAxes,
+                axes[i, j].text(0.95, 0.95, '$\Im('+'\mathbf{S}_' +'{{{} {}}})$'.format(CHANELS[i], CHANELS[j]), transform=axes[i, j].transAxes,
                                 horizontalalignment='right', verticalalignment='top', fontsize=14)
 
                 axes[i, j].set_xlim([5, 128])
