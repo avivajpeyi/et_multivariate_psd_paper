@@ -78,14 +78,17 @@ def plot_coherences(coherence_file_path, ax=None, case='A'):
                         color=f'C{i}', alpha=PSD_FILL_ALPHA, edgecolor='none', zorder=-10)
     
     # Plot c_xy, c_xz, c_yz only for Case A
-    true_kwgs = dict(color='k', linestyle='--', lw=0.5)
+    true_kwgs = dict(color='k', linestyle='-', lw=0.5)
+    expected_kwgs = dict(color='k', linestyle='--', lw=0.5)
     if case == 'A':
         ax.plot(freq_true, c_xy, **true_kwgs)
         ax.plot(freq_true, c_xz, **true_kwgs)
         ax.plot(freq_true, c_yz, **true_kwgs, label='True')
+        num_blocks = 125
+        ax.axhline(1/num_blocks, **expected_kwgs, label='Expected')
     if case == 'B':
         num_blocks = 125
-        ax.axhline(1/num_blocks, **true_kwgs)
+        ax.axhline(1/num_blocks, **expected_kwgs)
 
 
     ax.set_yscale('log')
@@ -115,6 +118,7 @@ def main():
 
     legend = axes[0].legend(
         handles=[
+            plt.Line2D([0], [0], color='k', label='True'),
             plt.Line2D([0], [0], color='k', label='Expected'),
             plt.Line2D([0], [0], color='C0', label='XY'),
             plt.Line2D([0], [0], color='C1', label='XZ'),
@@ -129,8 +133,10 @@ def main():
     )
     for handle in legend.get_lines():
         handle.set_linewidth(3)
-    legend.get_lines()[0].set_linestyle('--')
-    legend.get_lines()[0].set_linewidth(0.75)
+    legend.get_lines()[0].set_linestyle('-')
+    legend.get_lines()[0].set_linewidth(0.75)    
+    legend.get_lines()[1].set_linestyle('--')
+    legend.get_lines()[1].set_linewidth(0.75)
 
 
     axes[0].text(0.02, 0.98, 'Case A', transform=axes[0].transAxes, fontsize=10, verticalalignment='top',
