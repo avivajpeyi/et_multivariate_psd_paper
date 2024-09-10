@@ -17,6 +17,7 @@
 \usepackage[nolist,nohyperlinks]{acronym}
 \usepackage{amsmath, amsthm, amssymb, amsbsy, mathtools, mathalpha}
 
+
 \usepackage{graphicx}% Include figure files
 \usepackage{dcolumn}% Align table columns on decimal point
 \usepackage{bm}% bold math
@@ -53,22 +54,25 @@
 }% Force line breaks with \\
 
 \author{Jianan Liu$^{1}$}
+\email{jliu812@aucklanduni.ac.nz}
 \author{Avi Vajpeyi$^{1}$}
 \author{Renate Meyer$^{1}$}
-\author{Kamiel Janssens$^{3,2,4,5}$}%
+\email{renate.meyer@auckland.ac.nz}
+\author{Kamiel Janssens$^{2,3,4,5}$}%
 \author{Jeung Eun Lee$^{1}$}
-\author{Patricio Maturana-Russel$^{6}$}
+\author{Patricio Maturana-Russel$^{1,6}$}
 \author{Nelson Christensen$^{2}$}
 \author{Yixuan Liu$^{7}$}
 
 
- \email{Second.Author@institution.edu}
+ 
+ 
 \affiliation{$^{1}$Department of Statistics, University of  Auckland, 38 Princes St, Auckland, New Zealand}%
-\affiliation{$^{2}$Universit\'e C$\hat{o}$te d’Azur, Observatoire C$\hat{o}$te d’Azur, CNRS, Artemis, 06304 Nice, France}
-\affiliation{$^{3}$Universiteit Antwerpen, Prinsstraat 13, 2000 Antwerpen, Belgium}
+\affiliation{$^{2}$Universiteit Antwerpen, Prinsstraat 13, 2000 Antwerpen, Belgium}
+\affiliation{$^{3}$Universit\'e C$\hat{o}$te d’Azur, Observatoire C$\hat{o}$te d’Azur, CNRS, Artemis, 06304 Nice, France}
 \affiliation{$^{4}$Department of Physics, The University of Adelaide, Adelaide, SA 5005, Australia}
 \affiliation{$^{5}$ARC Centre of Excellence for Dark Matter Particle Physics, Australia}
-\affiliation{$^{6,1}$Engineering, Computer and Mathematical Sciences, Auckland University of Technology, Auckland, New Zealand}
+\affiliation{$^{6}$Department of Mathematical Sciences, Auckland University of Technology, Auckland, New Zealand}
 \affiliation{$^{7}$MRC Biostatistics Unit, University of Cambridge, Cambridge, UK}
 \collaboration{NZ Gravity}%\noaffiliation
 
@@ -78,9 +82,9 @@
 \begin{abstract}
  %This paper introduces a novel spectral density estimation method designed for analyzing very long multivariate time series, such as those encountered in data from gravitational wave detectors like the Einstein Telescope or LISA.
  %% AVI: I dont think its actually a novel method -- but a novel application... Hu + Prado introduced the novel method. We build upon the novel method + improve it with optimisation techniques + demonstrate with ET data.
-Gravitational wave detectors like the Einstein Telescope and LISA generate long multivariate time series data, which pose significant challenges in spectral density estimation due to the presence of correlated noise.
-Addressing this issue is crucial for accurately interpreting the signals detected by these instruments.
-This paper presents an application of a variational inference spectral density estimation method specifically tailored for such data. It is flexible in  that it does not rely on any specific parametric form for the multivariate spectral density.
+Gravitational wave detectors like the Einstein Telescope and LISA generate long multivariate time series, which pose significant challenges in spectral density estimation due to a number of overlapping signals as well as the presence of correlated noise.
+Addressing both issues is crucial for accurately interpreting the signals detected by these instruments.
+This paper presents an application of a variational inference spectral density estimation method specifically tailored for dealing with correlated noise in the data. It is flexible in that it does not rely on any specific parametric form for the multivariate spectral density.
 The method employs a blocked Whittle likelihood approximation for stationary time series and utilizes the Cholesky decomposition of the inverse spectral density matrix to ensure a positive definite estimator. 
 A discounted regularized horseshoe prior is applied to the spline coefficients of each Cholesky factor, and the posterior distribution is computed using a stochastic gradient variational Bayes approach. 
 This method is particularly effective in addressing correlated noise, a significant challenge in the analysis of multivariate data from co-located detectors. 
@@ -117,16 +121,18 @@ The method is demonstrated by analysing \SI{2000}{\second} of simulated Einstein
 \section{Introduction}
 
 The next-generation \ac{GW} detectors, e.g. \ac{ET}~\cite{Punturo_2010}, \ac{CE}~\cite{CE_horizon_study}, and \ac{LISA}~\cite{LISA_science_case}, will usher in a transformative era of \ac{GW} astronomy. 
-The increased sensitivity to \ac{GW} will lead to a much higher \ac{GW} detection rate, improving our understanding of cosmic phenomena, ranging from the dynamics of black hole mergers to the nature of the early universe~\cite{ET_science_case, Maggiore_2020_ET_science_case, Branchesi_2023_ET_science_case, CE_horizon_study, LISA_science_case}.
+The increased sensitivity to \ac{GW} will lead to a much higher \ac{GW} detection rate, improving our understanding of astrophysical and cosmic phenomena, ranging from the dynamics of black hole mergers to the nature of the early universe~\cite{ET_science_case, Maggiore_2020_ET_science_case, Branchesi_2023_ET_science_case, CE_horizon_study, LISA_science_case}.
 
 However, multivariate time series analysis of future GW detector data faces challenges in managing correlated multivariate noise~\cite{ET_design_report,LISA_red_book}.
 \ac{ET} and \ac{LISA}, which consist of co-located interferometers, may experience correlated noise in their data streams~\cite{Janssens2023}. 
-For \ac{ET}, this correlated noise can stem from seismic, Newtonian, and magnetic sources~\cite{Ball_lightning_strokes, Janssens_newtonian_seismic, Janssens_magnetic_noise}, while \ac{LISA}  may encounter noise from temperature variations and micro-thrusters~\cite{lisa_temp_noise,lisa_thrusters_noise}. 
+For \ac{ET}, this correlated noise can stem from seismic, Newtonian, and magnetic sources~\cite{Janssens_newtonian_seismic, PhysRevD.109.102002,Ball_lightning_strokes, Janssens_magnetic_noise}, while \ac{LISA}  may encounter noise from temperature variations and micro-thrusters~\cite{lisa_temp_noise,lisa_thrusters_noise}. 
 
 Ignoring correlated noise in analyses of multivariate \ac{GW} data can lead to biased parameter estimates and incorrect astrophysical conclusions (e.g., in analysing the stochastic \ac{GW} background~\cite{Thrane_correlations_SGWB, Christensen_2019_SGWB, boileau2022figures} and transient signals from events like binary black hole mergers~\cite{Cireddu:2023:arXiv}). 
-Although recent studies have shown the need for methods that can handle correlated noise~\cite{Cireddu:2023:arXiv,JanssensKamiel2023Ffps}, so far no method has been suggested to estimate  multivariate spectral densities  of gravitational wave network data. 
-In particular, a flexible Bayesian approach for matrix-valued spectral density estimation is needed. 
-Such an approach needs to be nonparametric, i.e., robust with respect to deviations from certain parametric shapes such as power laws in order to be able to capture all potential small- and large-scale noise characteristics.
+Recent studies have shown the need for methods that can handle correlated noise~\cite{Janssens2023}, but did not include a demonstration of Bayesian methods cable of effectively doing so. Other work, \cite{Cireddu:2023:arXiv} did demonstrate the capability to estimate the physical parameters of a compact binary coalescence event in a detector network with correlated noise. Their likelihood included the multivariate spectral density but they treated the spectral density as fixed with a focus on estimating the parameters of the binary chirp signal.  While this is an important step forward in the field, the authors of \cite{Cireddu:2023:arXiv} made a number of simplifying assumptions. First of all, they considered the correlated noise to be in phase. Secondly, they considered the detectors to be (almost) maximally correlated across the entire frequency spectrum. So far no Bayesian method has been suggested to estimate  multivariate spectral densities  of gravitational wave network data including correlated noise.  
+
+In this work, we demonstrate a method which is able to account for correlated noise as well as uncorrelated noise in a simultaneous and consistent approach. Additionally we make no assumptions about the phase of the different noise terms and model both real and imaginary cross-terms. While we demonstrate our method on a simplified noise example, the method forms the basis for future work with more complex noise scenarios, but this work shows the effectiveness of the chosen approach.
+Additionally our proposed method allows for
+ a flexible Bayesian approach for matrix-valued spectral density estimation, in a nonparametric way. Such a method is robust with respect to deviations from certain parametric shapes such as power laws in order to be able to capture all potential small- and large-scale noise characteristics.
 Furthermore, the approach must exhibit computational efficiency when applied to long time series of \ac{GW} observations, as in the case of ET and LISA. 
 \citet{MeierAlexander2020Bnao} and \citet{Liu2023} have developed non-parametric Bayesian approaches to multivariate spectral density estimation based on the Whittle likelihood and a Bernstein -- Hermitian positive semidefinite matrix-Gamma process prior on the spectral density matrix and used an adaptive MCMC algorithm to sample from the posterior. 
 Although theoretically attractive with proven consistency properties and contraction rates, MCMC methods require significant computation time due to the complexity of sampling from high-dimensional posterior distributions, making them impractical for long time series of \ac{GW} observations, where the computational burden increases dramatically.
@@ -154,29 +160,32 @@ Lastly, the article concludes with a summary of findings in Section~\ref{sec:Dis
 
 \subsection{Likelihood}
 
-\avi{State we are using two sided FFT}
-
 Assume we are given a time series of gravitational wave observations of length $n$ from $p$ channels. To set notation, 
-let $\Z=(\Z_1,\ldots,\Z_n)^ \intercal\in  \mathbb{R}^{n\times p}$ be a $p$-dimensional stationary, mean-zero time series, sampled at time intervals $\Delta_t=1/(2f_{Ny})$, where $f_{Ny}$ is the Nyquist frequency, for a total observation time of $T$ with a total of $n=T/\Delta_t$ sampled values for each of the $p$ dimensions. The frequency resolution, \(\Delta_f\), is given by\[\Delta_f = \frac{1}{n \Delta_t} = \frac{1}{T}.\] Let $\d_k$ be the \ac{DFT} of $\Z$ given by
-\begin{align*}
-\d(f_k) = \Delta_t\sum_{t=1}^{n} \Z_t\exp \left(-2\pi i \frac{k}{n} t \right)\, ,
-\end{align*}
-where $f_k= k \Delta_f= k/{n\Delta_t})=k /{T}$ for $k=1,\ldots, N$, where $N = n/2$ if n is even, $N = (n-1)/2$ if n is odd. In this analysis, we use the two-sided Fourior transform, which includes both positive and negative frequencies, allowing for a full representation of the frequency spectrum. However, for the purposes of this study, we only retain the positive frequency components.
+let $\Z=(\Z_1,\ldots,\Z_n)^ \intercal\in  \mathbb{R}^{n\times p}$ be a $p$-dimensional stationary, mean-zero time series, sampled at time intervals $\Delta_t=1/(2f_{Ny})$, where $f_{Ny}$ is the Nyquist frequency, for a total observation time of $T$ with a total of $n=T/\Delta_t$ sampled values for each of the $p$ dimensions. The frequency resolution, \(\Delta_f\), is given by
+\begin{align}
+\Delta_f = \frac{1}{n \Delta_t} = \frac{1}{T}\, .
+\end{align}
+Let $\d_k$ be the \ac{DFT} of $\Z$ given by
+\begin{align}
+\d(f_k) = \sqrt{\frac{\Delta_t}{n}}\sum_{t=1}^{n} \Z_t\exp \left(-2\pi i \frac{k}{n} t \right)\, ,
+\end{align}
+where $f_k= k \Delta_f= k/({n\Delta_t})=k /{T}$ for $k=1,\ldots, N$, where $N = n/2$ if n is even, $N = (n-1)/2$ if n is odd. In this analysis, we use the two-sided Fourier transform, which includes both positive and negative frequencies, allowing for a full representation of the frequency spectrum. However, for the purposes of this study, we only retain the positive frequency components.
 
 
-Due to the normalizing and decorrelating properties of the Fourier transform, the discrete Fourier coefficients $\d(f_k)$ (multiplied by $1 / \sqrt{n}$) are asymptotically independent and have a complex Gaussian distribution with covariance matrix given by the spectral density matrix $\S(f_k)$,  the Fourier transform of the autocovariance function. This asymptotic Gaussian distribution is the basis of the multivariate Whittle likelihood approximation in the frequency domain, expressed as
+Due to the normalizing and decorrelating properties of the Fourier transform, the discrete Fourier coefficients $\d(f_k)$ %(multiplied by $1 / \sqrt{n}$) 
+are asymptotically independent and have a complex Gaussian distribution with covariance matrix given by the spectral density matrix $\S(f_k)$,  the Fourier transform of the autocovariance function. This asymptotic Gaussian distribution is the basis of the multivariate Whittle likelihood approximation in the frequency domain, expressed as
 \begin{align}\label{eq:Whittle likelihood}
  \mathcal{L}(\d|\S) &\propto  \prod_{k=1}^{N} \det(\S(f_k))^{-1} \times \nonumber \\
- & \exp\left(-\frac{1}{n}\d(f_k)^* \S(f_k)^{-1} \d(f_k)\right)
+ & \exp\left(-\d(f_k)^* \S(f_k)^{-1} \d(f_k)\right)
 \end{align}
 where $\d^*(f_k)$ is the conjugate transpose of the $\d(f_k)$ and $\S(f_k)$ is a $p \times p$ Hermitian positive semidefinite spectral density matrix at each $f_k$. Therefore, the unknown quantity here is $\S$, a matrix-valued function at each frequency with the additional restriction that its value at each frequency is Hermitian positive semidefinite. Note that when estimating the spectral density matrix, it is important that the estimate is again positive semidefinite at each $f_k$ so that the quadratic form in the exponent of the Whittle likelihood remains positive and thus defines a valid likelihood.
 
 
 Given $\d$, one method to estimate the multivariate spectral density matrix $\S$ is Bayesian inference. In particular, having a flexible Bayesian method instead of simply using a frequentist Welch estimate is important when the ultimate task is to simultaneously estimate the parameters of a GW signal while properly taking the uncertainties of the instrumental noise estimation into account. The Bayes' theorem is given by
-\begin{eqnarray}
-    p(\S|\d) &=& \frac{\mathcal{L}(\d|\S)\pi(\S)}{\mathcal{Z}(\d)} \\
-    &\propto& \mathcal{L}(\d|\S)\pi(\S) ,
-\end{eqnarray}
+\begin{align}
+    p(\S|\d) =& \frac{\mathcal{L}(\d|\S)\pi(\S)}{\mathcal{Z}(\d)} \nonumber \\
+    \propto& \mathcal{L}(\d|\S)\pi(\S)\, ,
+\end{align}
 where $\pi(\S)$ is the prior distribution and $p(\S|\d)$ is the posterior density of unknown $\S$ given $\d$, 
 and $\mathcal{Z}(\d)$ is the Bayesian evidence (see ~\citet{thrane_talbot_bayesian_primer} and ~\citet{Christensen_PE_for_GW} for discussions on \ac{GW} Bayesian inference).
 
@@ -194,7 +203,7 @@ In practice, the number of blocks should be chosen to achieve a required frequen
 \label{subsec: parameters}
 The prior defined by \citet{RosenOri2007Aeom,Hu2023} models the components of the Cholesky factorization of the inverse spectral density matrix  via smoothing splines (for details, refer to \citet{Hu2023}).
 In their approach, the inverse of $\S(f_k)$ can be represented as $\S(f_k)^{-1} = \mathbf{T}_k^* \mathbf{D}_k^{-1} \mathbf{T}_k$, where $\mathbf{D}_k$ is a diagonal matrix with diagonal elements $\delta_{1k}^2, \delta_{2k}^2, ..., \delta_{pk}^2$ and
-\begin{align*}
+\begin{align}
 \mathbf{T}_k = \begin{pmatrix}
 1 & 0 & 0 & \cdots & 0 \\
 -\theta_{21}^{(k)} & 1 & 0 & \cdots & 0 \\
@@ -202,7 +211,7 @@ In their approach, the inverse of $\S(f_k)$ can be represented as $\S(f_k)^{-1} 
 \vdots & \vdots & \ddots & \ddots & 0 \\
 -\theta_{p1}^{(k)} & -\theta_{p2}^{(k)} & \cdots & -\theta_{p,p-1}^{(k)} & 1
 \end{pmatrix}
-\end{align*}
+\end{align}
 is a $p \times p$ complex unit lower triangular matrix. Thus the Whittle likelihood can be rewritten as the product of its $p$ components depending on $\btheta_j,\bdelta_j$, for $j=1,\ldots,p$,
 \begin{align}
  \mathcal{L}(\d|\S)
@@ -219,9 +228,9 @@ the parameters $\btheta_j,\bdelta_j$ represent the set of $\theta_k$ and $\delta
 Then $\log(\delta_{jk}^2)$ and the real and imaginary parts of $\theta_{jl}^{(k)}$ are modelled by Demmler-Reinsch basis functions in terms of $M$ truncated smoothing splines, given by
 
 \begin{align}
-\Re(\theta_{jl}^{(k)}) &= \alpha_{jl,0} + \alpha_{jl,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\alpha_{jl,s+1}, \\
-\Im(\theta_{jl}^{(k)}) &= \beta_{jl,0} + \beta_{jl,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\beta_{jl,s+1}, \\
-\log \delta_{jk}^2 &= \gamma_{j,0} + \gamma_{j,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\gamma_{j,s+1},  
+\Re(\theta_{jl}^{(k)}) &= \alpha_{jl,0} + \alpha_{jl,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\alpha_{jl,s+1}, \label{eq:real_theta} \\
+\Im(\theta_{jl}^{(k)}) &= \beta_{jl,0} + \beta_{jl,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\beta_{jl,s+1}, \label{eq:imag_theta} \\
+\log \delta_{jk}^2 &= \gamma_{j,0} + \gamma_{j,1}f_k + \sum_{s=1}^{M-1}\psi(f_k)\gamma_{j,s+1},  \label{eq:log_delta}
 \end{align}
 where $\psi(x) = \sqrt{2} \cos(s\pi x)$, with $s$ being an integer that ranges from 1 to $M-1$, represents the spline basis function. 
 The flexibility of the model can be adjusted by choosing the number of basis splines $M$.
@@ -247,10 +256,11 @@ The fundamental concept of \ac{VI} is to approximate the posterior distribution 
 Typically, the variational family is selected for its simplicity and computational tractability. 
 A product of normal distributions with mean $\mu_{ji}$ and variance $\sigma^2_{ji}$ is utilized for each element of the parameter $\bnu_j$.
 The goal of the variational approach is to identify the parameters $\phi_j=(\mu_{ji},\sigma^2_{ji})$, for $i=1,\ldots,\mbox{dim}(\bnu_j)$, that minimize the reverse Kullback-Leibler (KL) divergence between the variational family and the true posterior distribution, denoted as $d_{KL}(q_{\phi_j}||p_j)$), i.e.,
-\begin{eqnarray}\label{eq:phi_min}
-  \phi_j^* &=& \operatorname*{argmin_{\phi_j}} d_{KL}(q_{\phi_j}||p_j)  \\
-  &=& \operatorname*{argmin_{\phi_j}} \int \log\frac{q_{\phi_j}(\bnu_j)}{p_j(\bnu_j|\d_j)}q_{\phi_j}(\bnu_j) d\bnu_j\, .
-\end{eqnarray}
+\begin{align}\label{eq:phi_min}
+  \phi_j^* &= \operatorname*{argmin_{\phi_j}} d_{KL}(q_{\phi_j}||p_j) \nonumber \\
+  &= \operatorname*{argmin_{\phi_j}} \int \log\frac{q_{\phi_j}(\bnu_j)}{p_j(\bnu_j|\d_j)}q_{\phi_j}(\bnu_j) \, d\bnu_j \, .
+\end{align}
+
 The optimization algorithm employed in this work uses a SGVB approach, as described by \citet{kingma2022,Xu2019,Domke2019}. \smallskip
  
 
@@ -287,7 +297,8 @@ The SGVB approach is used to estimate $\phi^*_j$, $j=1,...,p$ and it consists of
  \end{enumerate}
 
 The performance of each maximizer depends on the learning rate; if the learning rate is too small or too large, the optimization algorithm may get stuck at a local maximum or take too long to find the global maximum. 
-Thus, choosing the optimal learning rate is crucial.
+Thus, choosing the optimal learning rate is crucial. Recently \cite{Welandawe2024} proposed automated techniques for the blackbox VB in which the learning rate is adaptively decreased. The reliability of the stochastic optimization methods for VB due to substantial hand-tuning parameters to apply effectively were discussed in literature \cite{Agrawal2020,Welandawe2024}.
+
 While \citet{Hu2023} selected a specific but arbitrary value for the learning rate, this study proposes a method to select the optimal learning rate and automate the selection procedure.
 
 Let $\tau_1$ and $\tau_2$ be the learning rates associated with the first and second steps, respectively. 
@@ -297,7 +308,7 @@ An appropriate $\tau_1$ is obtained by maximizing the ELBO
 \tau_1^* = \operatorname*{argmax_{\tau_1}} \prod^p_{j=1}\text{ELBO}(q_{\phi_j}, p_j(\boldsymbol{\nu}_j|\mathbf{d}_j)) \,.    
 \end{equation}
 This optimization is carried out over a continuous parameter space using the Python package \hyperopt~\cite{Bergstra2013} and the tree-structured Parzen Estimator (TPE) algorithm~\cite{Bergstra2011}. 
-From our preliminary study, the optimal learning rates coincide with the learning rates optimized jointly. 
+From our preliminary study, the optimal learning rates obtained by fixing $\tau_2$ coincide with those obtained when optimizing $\tau_1$ and $\tau_2$ jointly.
 The maximum number of iterations for the optimisation procedure is set to \num{10 000}. 
 
 
@@ -317,14 +328,13 @@ where $\S_{xy}(f_k)$ is the cross-spectral density between components $x$ and $y
 \section{Simulation study}
 \label{sec:simulation}
 
-In order to test the efficiency and accuracy of SGVB, 500 independent realisations of a bivariate time series are generated from a vector autoregressive model of order 2 (VAR(2)) and a vector moving-average model of order 1 (VMA(1)), using three  different sample sizes $n=256,512,1024$ (refer to \citet[Section~4.2,][]{Liu2023} for the definitions of the VAR(2) and VMA(1) models). 
+In order to test the efficiency and accuracy of SGVB, 500 independent realisations of a bivariate time series are generated from a vector autoregressive model of order 2 (VAR(2)) and a vector moving-average model of order 1 (VMA(1)), using three  different sample sizes $n=256;512;1024$ (refer to \citet[Section~4.2,][]{Liu2023} for the definitions of the VAR(2) and VMA(1) models). 
 The spectral densities are estimated using both the \ac{SGVB} method and \citet{Liu2023}'s vectorized nonparametrically corrected method (VNPC), an MCMC-based approach that samples from the exact posterior distribution without a variational approximation\footnote{For the VNPC analyses, we use the software and settings provided by \citet{Liu2023}, specific for the VAR(2) and VMA(1) models.}.
 
 In order to avoid underfitting in SGVB, an appropriate number of basis functions is determined for each dataset using the method discussed in Section~\ref{subsec:sgvb_details}. 
 Figure~\ref{fig:sim_basis} shows the log MLE (normalized for comparison between datasets) plotted against the number of basis functions.
 $M=30$ is set as the log MLE enters a steady ascent phase and before any perturbations appear, thereby avoiding both underfitting across the three different dataset sizes. 
-When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$ due to overfitting; the number of parameters ($(M+1)4$ for bivariate time series) exceeds the number of data points.  
-\jliu{what does the $(M+1)4$ mean?}
+When $n=256$, a rapid increase of the log-likelihood is observed as $M>50$, indicating overfitting. As shown in equations \eqref{eq:real_theta}, \eqref{eq:imag_theta}, and \eqref{eq:log_delta}, the number of parameters is $4(M+2)$ for a bivariate time series, which exceeds the number of data points.
 
 
 \begin{figure}
@@ -376,7 +386,7 @@ Additionally, Table~\ref{table:simstudy} presents the simulation study's median 
 Figure~\ref{fig:sim_error_violins} reveals that as the sample size increases, both methods achieve lower median $L_2$ errors, and the median $L_2$ errors are similar between the two methods. 
 Additionlly, Figure~\ref{fig:sim_speed_violins} shows the median speed-up factor for SGVB becomes increasingly pronounced, ultimately surpassing VNPC by more than 50 times, as $n$ is increased. 
 Notably, when $n=1024$, SGVB's accuracy is only marginally lower than VNPC's, yet it reduces median computation time by a factor of approximately 50. 
-The simulation study provides empirical evidence for the consistency of the SGVB approach, demonstrating that as sample size grows, the posterior distributions contracts around the true spectral density, following the same trend as the VNPC approach. 
+The simulation study provides empirical evidence for the consistency of the SGVB approach, demonstrating that as sample size grows, the posterior distributions contracts around the true spectral density, following the same trend as the VNPC approach. However, it does so at a fraction of the computation time.
 
 Finally, Table~\ref{table:simstudy} illustrates that, even though VNPC method consistently outperforms SGVB across all sample sizes in terms of pointwise coverage, typically achieving 83-90\% coverage compared to SGVB's 61-66\%, SGVB generally produces narrower credible regions.
 %, suggesting a trade-off between coverage and precision in the estimates.
@@ -408,24 +418,24 @@ In the rest of the paper we refer to this colored Gaussian noise as \textit{ET n
 Following \citet{Janssens2023}, non-identical correlated noise in the X, Y, and Z channels is simulated by injecting colored Gaussian noise characterized by frequency-domain Gaussian peaks. 
 The power spectral density is given by 
 \begin{equation}
-    \Sn(f, \mu, A) = \left( \frac{A}{\sqrt{2\pi}} \exp\left\{ -\frac{1}{2}  (f-\mu)^2 \right\} \right)^2\, ,
+    \S_n^{GP}(f, \mu, A) = \left( \frac{A}{\sqrt{2\pi}} \exp\left\{ -\frac{1}{2}  (f-\mu)^2 \right\} \right)^2\, ,
 \end{equation}
 where $A$ represents the amplitude, and $\mu$ the frequency peak location.
 
 Gaussian noise is injected at specific frequencies in each channel as follows
 {\small 
 \begin{align*}
-    \textbf{X}&: \textstyle{\Sn(\mu\eqq\SI{10}{Hz}, A\eqq4\ex{24}), \Sn(\mu\eqq\SI{50}{Hz}, A\eqq2\ex{24})}\, ,\\
-    \textbf{Y}&: \Sn(\mu\eqq\SI{10}{Hz}, A\eqq4\ex{24}), \Sn(\mu\eqq\SI{90}{Hz}, A\eqq1.5\ex{24})\, ,\\
-    \textbf{Z}&: \Sn(\mu\eqq\SI{50}{Hz}, A\eqq2\ex{24}),  \Sn(\mu\eqq\SI{90}{Hz}, A\eqq1.5\ex{24}).
+    \textbf{X}&: \textstyle{\S_n^{GP}(\mu\eqq\SI{10}{Hz}, A\eqq4\ex{24}), \S_n^{GP}(\mu\eqq\SI{50}{Hz}, A\eqq2\ex{24})}\, ,\\
+    \textbf{Y}&: \S_n^{GP}(\mu\eqq\SI{10}{Hz}, A\eqq4\ex{24}), \S_n^{GP}(\mu\eqq\SI{90}{Hz}, A\eqq1.5\ex{24})\, ,\\
+    \textbf{Z}&: \S_n^{GP}(\mu\eqq\SI{50}{Hz}, A\eqq2\ex{24}),  \S_n^{GP}(\mu\eqq\SI{90}{Hz}, A\eqq1.5\ex{24}).
 \end{align*}
 }
 To introduce correlated noise between channel pairs, we utilize identical Gaussian peaks at matching frequencies across the paired channels. 
 In contrast, for uncorrelated noise scenarios, independent Gaussian peaks are simulated for each channel, ensuring that there is no cross-channel correlation.
 
-As stated in \citet{JanssensKamiel2023Ffps}, this dataset is inherently simplified due to the distinct nature of the correlated noise terms, which are highly differentiable. 
+As stated in \citet{Janssens2023}, this dataset is inherently simplified due to the distinct nature of the correlated noise terms, which are highly differentiable. 
 Nevertheless, it serves as a valuable initial demonstration of our approach. 
-\avi{Kamiel can you discuss the bit about correlated power law noise here?}
+Future work aims to investigate more realistic and complex noise scenarios, such as the presence of correlated magnetic \citet{Janssens_magnetic_noise,Ball_lightning_strokes} and/or Newtonian noise \cite{Janssens_newtonian_seismic,PhysRevD.109.102002} as well as (multiple) GW signals. However, this is considered beyond the scope of this work where we want to lay the foundation for the estimation framework.
 
 \subsection{Data Analysis}
 
@@ -454,21 +464,21 @@ Each Whittle likelihood block uses identical basis function expressions defined 
 Figure~\ref{et_corr_basis_funs_vs_mle} displays the log maximum
 likelihood estimates (MLE) across a range of $M$ for each case.
 As the log MLE stabilizes around $M\sim400$, we set $M=450$.
-Using the methodology discussed in Section~\ref{sec:method}, the PSDs for each case are estimated and plotted in Figure~\ref{fig:ET_PSDS}. For each case, the diagonal subplots represent the spectral densities for X, Y and Z channels. Since the off-diagonal elements of the PSD matrix at each frequency are complex numbers, with the elements above the diagonal being the conjugates of those below, we plot the real part of the off-diagonal elements in the upper subplot and the imaginary part in the lower subplot.
+Using the methodology discussed in Section~\ref{sec:method}, the PSDs for each case are estimated and plotted in Figure~\ref{fig:caseA_psd} and Figure~\ref{fig:caseBC_psd}. For each case, the diagonal subplots represent the spectral densities for X, Y and Z channels. Since the off-diagonal elements of the PSD matrix at each frequency are complex numbers, with the elements above the diagonal being the conjugates of those below, we plot the real part of the off-diagonal elements in the upper subplot and the imaginary part in the lower subplot.
 Additionally, the squared coherences are plotted for the cases in Figure~\ref{fig:squared_coh}. The plot shows the squared coherences estimation between any pair of channels for case A and case B.
 
 
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{caseA_psd.pdf}
-\caption{Case A PSD. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the \avi{jianan fill out}, while the lower triangle subplots show \avi{jianan fill out.}}
+\caption{Case A PSD. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the real parts of the off-diagonal elements of the spectral density matrix, while the lower triangle subplots show the imaginary parts of the off-diagonal elements.}
 \label{fig:caseA_psd}
 \end{figure*}
 
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{caseBC_psd.pdf}
-\caption{Case B and C PSDs. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the \avi{jianan fill out}, while the lower triangle subplots show \avi{jianan fill out.}}
+\caption{Case B and C PSDs. The plot shows the periodogram (gray), the PSD estimates (colored, with 90\% credible interval shaded) and the true PSD (black curve in the diagonals). The upper triangle subplots show the real parts of the off-diagonal elements of the spectral density matrix, while the lower triangle subplots show the imaginary parts of the off-diagonal elements.}
 \label{fig:caseBC_psd}
 \end{figure*}
 
@@ -495,7 +505,7 @@ Additionally, the squared coherences are plotted for the cases in Figure~\ref{fi
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{caseAB_coh.pdf}
-  \caption{Squared coherence estimation for any pair of channels in cases A (top) and B (bottom). The solid curves represent the median estimated squared coherences, while the shaded areas indicate the corresponding 90\% credible interval. The black dashed line is the true coherence (zero in case B).}
+  \caption{Squared coherence estimation for any pair of channels in cases A (top) and B (bottom). The solid curves represent the median estimated squared coherences, while the shaded areas indicate the corresponding 90\% credible interval.  The black solid line is the true squared coherence, and the black dashed line is the expected coherence from uncorrelated white noise data.}
   \label{fig:squared_coh}
 \end{figure}
 
@@ -503,31 +513,31 @@ Additionally, the squared coherences are plotted for the cases in Figure~\ref{fi
 
 In all three cases, prominent spectral peaks are observed at the specific frequencies in each channel, consistent with the injected Gaussian noise peaks.  
 This demonstrates the ability of our proposed method to accurately capture and identify these peaks. 
+We note that our PSD estimates exhibit oscillatory features around the Gaussian peaks, this is most likely linked to the relatively loud and sharp Gaussian peak features. This highlights one of the potential weaknesses of the SGVB method: its potential difficulty to  fit very sharp features. For more realistic data sets including correlated noise from magnetic and/or Newtonian noise origin, this will most likely form less of an issue due to the smooth, power law like behaviour of such noise sources \citet{Janssens_magnetic_noise,Janssens_newtonian_seismic,PhysRevD.109.102002,Janssens2023}. However, this could form an issue with actual detector data which is contaminated with a large amount of instrumental spectral noise lines. Future work will aim to investigate the capabilities of the SGVB method and its efficiency in deal with such complexity using real GW data and whether pre-cleaning steps should be undertaken. However, the dramatic speedup of PSD estimation using the SGVB remains an extremely potent benefit for next generation GW detectors. Without faster novel noise estimates techniques, such as the one proposed in this work, the resulting science will very likely be limited by available computation time.
 
 In case A, where correlated noise is intentionally introduced, substantial coherence between channel pairs is observed at their shared peak frequencies (see the top panel of Figure~\ref{fig:squared_coh}). 
 Specifically, high coherence is evident between channels X and Y at \SI{10}{Hz}, X and Z at \SI{50}{Hz}, and Y and Z at \SI{90}{Hz}. 
 The median estimates for the squared coherence aligns with the true coherence, demonstrating that our estimate accurately reflects the underlying correlated noise structure. This alignment validates the effectiveness of our spectral analysis in capturing inter-channel relationships.
 
-Case B, which considers ET noise data with nominally uncorrelated noise, reveals, despite the absence of deliberately injected correlations, minor fluctuations in the off-diagonal subplots representing the real and imaginary parts of the estimated spectral densities.
-These fluctuations manifest as small ($C_{xy}\lesssim0.02)$, near-zero coherence values in the corresponding squared coherence plots. 
-This observation is consistent with theoretical expectations: for a time series segmented into $N_b$ blocks, the coherence is expected to be approximately $1/N_b$~\citeme. 
-\avi{kamiel to discuss a bit about the expected coherence -- is it an issue that our estimate does not contain the true?}
-% The small non-zero coherence values observed in our analysis likely reflect this statistical phenomenon rather than any genuine correlation between the channels.
 
-In case C, where the three channels are assumed independent, the estimated spectral densities yield zero off-diagonal (the XY, YZ, ZX components) PSD estimates. 
+Case B, which considers ET noise data with nominally uncorrelated noise, reveals minor fluctuations in the off-diagonal subplots representing the real and imaginary parts of the estimated spectral densities, despite the absence of deliberately injected correlations. These fluctuations manifest as small coherence values (median $C_{xy} < 0.008$) that fluctuate around the true zero coherence in the corresponding squared coherence plots of Figure~\ref{fig:squared_coh} (visible as they are plotted on a log-scale). Notably, the median squared coherence fluctuations are lower than those expected from uncorrelated white noise data, which scale as approximitaly the inverse of the number of data segments used to average over. In this case, i.e.  $1/N_b = 0.008$. The squared coherence estimates based on the SGVB method are below this estimate and hence are consistent with zero coherence.
+
+
+In case C, where the three channels are assumed independent, the estimated spectral densities yield zero off-diagonal (the XY, YZ, XZ components) PSD estimates. 
 Consequently, the squared coherence between any pair of channels is uniformly zero across all frequencies. 
 This result aligns with theoretical expectations for uncorrelated channels,  providing a baseline to assess the degree of correlation in the other cases.
+Comparing case B and C teaches us two important features about the effectiveness of our SGVB model. First of all, as one would expect, a model with less complexity (case C) typically yields a more accurate estimate compared to a more complex model (case B). More concretely, the average RMS\footnote{The average RMS is calculated as the mean of the square root of the mean squared values of the expected median spectral density matrix elements across the frequency band.
+} over the frequency band 0 to \SI{128}{Hz}  is $2.592 \times 10^{-49}$ for case B and $2.586 \times 10^{-49}$ for case C. However, the difference between both different scenario's is relatively small, showcasing the huge potential and flexibility of the SGVB approach in esitmating detector noise whether correlated noise is present or not.
 
-\avi{Add plot of ratio of true vs estimated psd. }\jliu{The true psd has length 3000 and cross the whole frequency range i.e., from 0 to 1024Hz. The estimated psd has length 2048 and cross the frequency range form 0 to 128Hz. I think the ratio should be found at the same frequency points for them.}
-\avi{Kamiel to add some more motivation on Case C}
 
 These findings collectively demonstrate the capability of this spectral estimation technique to characterize both the individual channel spectra and the inter-channel correlations across various noise scenarios. 
-
 Furthermore, the clear differentiation between the correlated (case A), minimally correlated (case B), and uncorrelated (case C) scenarios validates the robustness of our analytical approach.
+
+
 
 \section{Conclusions}
 \label{sec:Discussion}
-Recent work has pointed out the importance of taking into account correlated interferometer network noise when estimating the parameters of gravitational wave signals observed by ground-based detectors such as ET or space-based detectors such as LISA~\cite{x,y,z}. 
+Recent work has pointed out the importance of taking into account correlated interferometer network noise when estimating the parameters of gravitational wave signals observed by ground-based detectors such as ET or space-based detectors such as LISA~\cite{ET_design_report, Janssens2023, LISA_red_book}. 
 However, so far, no statistical methodology has been suggested to estimate the multivariate noise spectral density of a detector network.
 In this study, we propose a computationally efficient variational Bayesian approach for estimating the spectral density of multivariate time series. 
 It is important to note that this technique does not assume any restrictive parametric form of the spectral density, allowing it to adapt to any shape of the PSD.
@@ -541,35 +551,33 @@ In the correlated noise case, our approach successfully detected the injected Ga
 
 These findings have significant implications for GW data analysis. The ability to efficiently and accurately estimate spectral densities and inter-channel correlations is crucial for optimizing detection algorithms and understanding noise characteristics in GW detectors. Our method's computational efficiency makes it particularly suitable for analyzing large-scale datasets expected from next-generation detectors (e.g. ET and LISA). The flexibility of our method, combined with its computational efficiency, makes it particularly suitable for analyzing large-scale datasets expected from next-generation GW detectors such as ET and LISA.
 
-Future work could explore the application of this method to real GW detector data and its extension to simultaneously analyzing a stochastic GW background signal. 
-Additionally, investigating the method's performance on GPUs could further validate its scalability, robustness and versatility.
+Future work could explore the application of this method to real GW detector data and its extension to simultaneously analyzing a stochastic GW background signal. Jointly analysing the six channels of two detector networks such as TianQin and LISA could provide an more flexible alternative to cross-correlation detection  \cite{liang2024}.
 Further investigations could examine the implications of these spectral characteristics on GW detection sensitivity and methods to mitigate correlated noise effects in ET or LISA. Extending the analysis to longer time series or different ET configurations could provide insights into the stability and generalizability of these spectral features.
+Additionally, investigating the method's performance on GPUs could further validate its scalability, robustness and versatility.
 
 In conclusion, the variational Bayes approach offers a promising tool for spectral density estimation in GW data analysis, combining accuracy with computational efficiency. This method has the potential to enhance our ability to characterize detector noise and ultimately improve GW detection capabilities.
 
 
 
-
-\section*{Data and Software Availability}
-The software developed for this research is available on GitHub (\url{https://github.com/nz-gravity/sgvb_psd}) under the MIT License. 
-The specific version used in this study has been archived on Zenodo~\citeme. 
-Documentation and examples for the software can be found at \url{https://nz-gravity.github.io/sgvb_psd/}.
-All data products are available in the project's OSF repository (https://doi.org/10.17605/OSF.IO/ABCDE)\cite{}.
-\avi{Jianan we have to finish up the examples, tag and pin a version in zenodo, put data on OSF}
+%% TEMPORARILY COMMENTING OUT 
+%% WHILE WE CLEAN UP
+% \section*{Data and Software Availability}
+% The software developed for this research is available on GitHub (\url{https://github.com/nz-gravity/sgvb_psd}) under the MIT License. 
+% Documentation and examples for the software can be found at \url{https://nz-gravity.github.io/sgvb_psd/}.
+% The specific code version used, along with the the raw data and data products for this work have been archived on Zenodo~\cite{}.
 
 
 
 
 \begin{acknowledgments}
-We like to thank Zhixiong Hu and Racquel Prado for making their code publicly available and for helpful discussions. AV,  JEL, NC, PMR and RM gratefully acknowledge support  by the Marsden Fund Council grant MFP-UOA2131 from New Zealand Government funding, managed by the Royal Society Te Apārangi. KJ was supported by FWO-Vlaanderen via grant number 11C5720N during part of this work.
+We thank Zhixiong Hu and Racquel Prado for making their code publicly available and for helpful discussions. AV,  JEL, NC, PMR and RM gratefully acknowledge support  by the Marsden Fund Council grant MFP-UOA2131 from New Zealand Government funding, managed by the Royal Society Te Apārangi. KJ was supported by FWO-Vlaanderen via grant number 11C5720N during part of this work.
 We thank the New Zealand eScience Infrastructure
 (NeSI) \url{https://www.nesi.org.nz} for the use of their high performance computing facilities and the Centre for eResearch at the University of Auckland for their technical
 support.
 \end{acknowledgments}
 
 
-\vspace{3mm}
-
+\vspace{4mm}
 \noindent\textit{Software used:}
 \python~\cite{python2020},
 \tensorflowProb~\cite{tensorflow, tensorflowProb}
