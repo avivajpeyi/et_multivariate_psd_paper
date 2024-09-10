@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import paths
 from matplotlib.lines import Line2D
+from matplotlib.ticker import ScalarFormatter
 
 DATA = pd.read_csv(f'{paths.data}/basis_fun_vs_max_lnl_results_var2_vma1.csv').values
 X = range(1, 71)
@@ -19,9 +20,6 @@ def main():
     fig = plt.figure()
     ax = fig.gca()
 
-
-
-
     plot_basis_vs_lnl(ax, DATA[:, 3:])
     plot_basis_vs_lnl(ax, DATA[:, :3], kwgs=dict(ls='dotted'))
 
@@ -38,8 +36,15 @@ def main():
     # bbox_to_anchor=(1.02, 1), borderaxespad=0)
     ax.set_xlabel(r'$M$')
     ax.set_ylabel(r'Normalised log MLE')
+
+    # use scientific notation use x100 instead of 1e2
+    ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0), useMathText=True)
+    # turn off minor
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+
     plt.xlim(min(X), max(X))
-    fig.savefig(f'{paths.figures}/sim_basis.pdf', bbox_inches='tight')
+    fig.savefig(f'{paths.figures}/sim_basis.pdf', bbox_inches='tight', pad_inches=0.025)
 
 
 if __name__ == "__main__":

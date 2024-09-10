@@ -21,7 +21,11 @@ def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     ax.set_xlabel(r'$M$')
     ax.set_ylabel(r'Normalised log MLE')
     ax.set_xlim(min(number_basis), max(number_basis))
+    ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0), useMathText=True)
 
+    # turn off minor
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.yaxis.set_minor_locator(plt.NullLocator())
 
 
 def main():
@@ -44,7 +48,7 @@ def main():
 
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{paths.figures}/et_basis_fns.pdf", dpi=300)
+    plt.savefig(f"{paths.figures}/et_basis_fns.pdf", dpi=300, pad_inches=0.025)
 
 if __name__ == "__main__":
     main()

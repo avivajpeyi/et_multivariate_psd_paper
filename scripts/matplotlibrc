@@ -9,6 +9,7 @@ figure.figsize : 3.5, 2.625
 
 # Set default font size for various elements
 axes.labelsize : 15
+axes.axisbelow : False
 
 # Set x axis
 xtick.direction : in
@@ -38,8 +39,11 @@ lines.linewidth : 1.
 legend.frameon : False
 
 # Always save as 'tight'
+# Always save figures with tight bounding box
 savefig.bbox : tight
-savefig.pad_inches : 0.05
+
+# Set padding for saved figures
+savefig.pad_inches : 0
 
 # Font Family
 font.family: STIXGeneral

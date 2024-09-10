@@ -552,16 +552,17 @@ def plot_et_matrix(
         return axes
 
 
-def main():
+
+def __plot_A():
     axes = plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
         matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
         psd_col="C0",
         label="Case A PSD"
     )
-    axes[0,0].get_figure().savefig(f'{paths.figures}/caseA_psd.pdf')
+    axes[0, 0].get_figure().savefig(f'{paths.figures}/caseA_psd.pdf')
 
-
+def __plot_AD():
     axes = plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
         matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
@@ -586,6 +587,10 @@ def main():
         loc='lower right', fontsize=10)
 
     axes[0,0].get_figure().savefig(f'{paths.figures}/caseAD_psd.pdf')
+
+
+def __plot_BC():
+
 
     axes = plot_et_matrix(
         channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
@@ -612,6 +617,11 @@ def main():
         loc='lower right', fontsize=10)
 
     axes[0,0].get_figure().savefig(f'{paths.figures}/caseBC_psd.pdf')
+
+
+def main():
+    __plot_A()
+    __plot_BC()
 
 if __name__ == '__main__':
     main()    
