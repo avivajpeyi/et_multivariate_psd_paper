@@ -1,13 +1,14 @@
 import h5py
 import matplotlib.pyplot as plt
 import paths
+from paths import LBL_FONTSIZE
 from matplotlib.ticker import FixedLocator
 import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 
+
 PSD_FILL_ALPHA = 0.3
-LABEL_FS = 'x-large'
 
 
 def compute_true_coherence():
@@ -162,13 +163,13 @@ def main():
         ax.tick_params(axis='y', which='major', pad=0.2)
 
     # remove verrical whitespaace beteweenn subplots
-    axes[1].set_xlabel('Frequency [Hz]')
+    axes[1].set_xlabel('Frequency [Hz]', fontsize=LBL_FONTSIZE*0.8)
     plt.subplots_adjust(hspace=0., wspace=0.)
     # for ax in axes:
     #     ax.set_ylabel(r'$C_{xy}$', labelpad=-8)
 
     #common y label for both subplots C_{xy}
-    fig.text(0.0155, 0.5, r'$C_{xy}$', va='center', rotation='vertical', fontsize=15)
+    fig.text(0.0155, 0.5, r'$C_{xy}$', va='center', rotation='vertical', fontsize=LBL_FONTSIZE)
 
     fig.align_ylabels(axes, )
     fig.savefig(f'{paths.figures}/caseAB_coh.pdf')

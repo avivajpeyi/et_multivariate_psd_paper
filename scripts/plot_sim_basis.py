@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import paths
 from matplotlib.lines import Line2D
 from matplotlib.ticker import ScalarFormatter
+from paths import LBL_FONTSIZE
 
 DATA = pd.read_csv(f'{paths.data}/basis_fun_vs_max_lnl_results_var2_vma1.csv').values
 X = range(1, 71)
@@ -34,8 +35,8 @@ def main():
         Line2D([0], [0], color='k', lw=2, label='VMA(1)', ls='dotted'),
     ], loc='lower right', ncol=2, labelspacing=0.05, columnspacing=0.25, handlelength=1)
     # bbox_to_anchor=(1.02, 1), borderaxespad=0)
-    ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Normalised log MLE')
+    ax.set_xlabel(r'$M$', fontsize=LBL_FONTSIZE*0.8)
+    ax.set_ylabel(r'Normalised log MLE', fontsize=LBL_FONTSIZE*0.95)
 
     # use scientific notation use x100 instead of 1e2
     ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0), useMathText=True)

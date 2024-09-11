@@ -7,6 +7,10 @@ import matplotlib
 from matplotlib import font_manager
 
 
+LBL_FONTSIZE = 12.5
+
+
+
 # Absolute path to the top level of the repository
 src = Path(__file__).resolve().parents[1].absolute()
 

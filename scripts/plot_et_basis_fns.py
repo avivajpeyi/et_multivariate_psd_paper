@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import paths
+from paths import LBL_FONTSIZE
 
 def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     # Load data from CSV
@@ -18,8 +19,8 @@ def plot_basis_vs_lnl(ax, csv_path, label, kwgs={}):
     # Normalize the max_lnl_sorted
     max_lnl_normalized = max_lnl_sorted - max_lnl_sorted.max()
     ax.plot(number_basis_sorted, max_lnl_normalized, label=label, **kwgs)
-    ax.set_xlabel(r'$M$')
-    ax.set_ylabel(r'Normalised log MLE')
+    ax.set_xlabel(r'$M$', fontsize=LBL_FONTSIZE*0.95)
+    ax.set_ylabel(r'Normalised log MLE', fontsize=LBL_FONTSIZE*0.95)
     ax.set_xlim(min(number_basis), max(number_basis))
     ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0), useMathText=True)
 
