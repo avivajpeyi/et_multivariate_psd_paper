@@ -16,6 +16,7 @@
 \usepackage{graphicx} 
 \usepackage[nolist,nohyperlinks]{acronym}
 \usepackage{amsmath, amsthm, amssymb, amsbsy, mathtools, mathalpha}
+% \usepackage{authblk}
 
 
 \usepackage{graphicx}% Include figure files
@@ -45,33 +46,16 @@
 
 
 
+
 \begin{document}
 
 \preprint{APS/123-QED}
 
 
+
 \title{Variational inference for correlated\\ gravitational wave detector network noise
-}% Force line breaks with \\
-
-\author{Jianan Liu$^{1}$}
-\author{Avi Vajpeyi$^{1}$}
-\author{Renate Meyer$^{1}$}
-\author{Kamiel Janssens$^{3,2,4,5}$}%
-\author{Jeung Eun Lee$^{1}$}
-\author{Patricio Maturana-Russel$^{6}$}
-\author{Nelson Christensen$^{2}$}
-\author{Yixuan Liu$^{7}$}
-
-
-
-
-\affiliation{$^{1}$Department of Statistics, University of  Auckland, 38 Princes St, Auckland, New Zealand}%
-\affiliation{$^{2}$Universiteit Antwerpen, Prinsstraat 13, 2000 Antwerpen, Belgium}
-\affiliation{$^{3}$Universit\'e C$\hat{o}$te d’Azur, Observatoire C$\hat{o}$te d’Azur, CNRS, Artemis, 06304 Nice, France}
-\affiliation{$^{4}$Department of Physics, The University of Adelaide, Adelaide, SA 5005, Australia}
-\affiliation{$^{5}$ARC Centre of Excellence for Dark Matter Particle Physics, Australia}
-\affiliation{$^{6}$Department of Mathematical Sciences, Auckland University of Technology, Auckland, New Zealand}
-\affiliation{$^{7}$MRC Biostatistics Unit, University of Cambridge, Cambridge, UK}
+}
+\input{authors}
 \collaboration{NZ Gravity}%\noaffiliation
 
 \date{\today}% It is always \today, today,
@@ -176,7 +160,7 @@ are asymptotically independent and have a complex Gaussian distribution with cov
  \mathcal{L}(\d|\S) &\propto  \prod_{k=1}^{N} \det(\S(f_k))^{-1} \times \nonumber \\
  & \exp\left(-\d(f_k)^* \S(f_k)^{-1} \d(f_k)\right)
 \end{align}
-where $\d^*(f_k)$ is the conjugate transpose of the $\d(f_k)$ and $\S(f_k)$ is a $p \times p$ Hermitian positive semidefinite spectral density matrix at each $f_k$. Therefore, the unknown quantity here is $\S$, a matrix-valued function at each frequency with the additional restriction that its value at each frequency is Hermitian positive semidefinite. Note that when estimating the spectral density matrix, it is important that the estimate is again positive semidefinite at each $f_k$ so that the quadratic form in the exponent of the Whittle likelihood remains positive and thus defines a valid likelihood.
+where $\d(f_k)^*$ is the conjugate transpose of the $\d(f_k)$ and $\S(f_k)$ is a $p \times p$ Hermitian positive semidefinite spectral density matrix at each $f_k$. Therefore, the unknown quantity here is $\S$, a matrix-valued function at each frequency with the additional restriction that its value at each frequency is Hermitian positive semidefinite. Note that when estimating the spectral density matrix, it is important that the estimate is again positive semidefinite at each $f_k$ so that the quadratic form in the exponent of the Whittle likelihood remains positive and thus defines a valid likelihood.
 
 
 Given $\d$, one method to estimate the multivariate spectral density matrix $\S$ is Bayesian inference. In particular, having a flexible Bayesian method instead of simply using a frequentist Welch estimate is important when the ultimate task is to simultaneously estimate the parameters of a GW signal while properly taking the uncertainties of the instrumental noise estimation into account. The Bayes' theorem is given by
@@ -378,7 +362,7 @@ Figure~\ref{fig:sim_speed_violins} displays the speed-up factor of the SGVB comp
 Additionally, Table~\ref{table:simstudy} presents the simulation study's median $L_2$ errors, pointwise coverage, and median width of pointwise 90\% credible regions, as well as the median computation time (in seconds)\footnote{Pointwise coverage is defined as the proportion of times the true spectral density value at each frequency is captured within the confidence interval across different realizations of the data.}. 
 
 
-\input{table3}
+\input{table}
 
 
 Figure~\ref{fig:sim_error_violins} reveals that as the sample size increases, both methods achieve lower median $L_2$ errors, and the median $L_2$ errors are similar between the two methods. 
@@ -520,16 +504,14 @@ The median estimates for the squared coherence aligns with the true coherence, d
 
 Case B, which considers ET noise data with nominally uncorrelated noise, reveals minor fluctuations in the off-diagonal subplots representing the real and imaginary parts of the estimated spectral densities, despite the absence of deliberately injected correlations. These fluctuations manifest as small coherence values (median $C_{xy} < 0.008$) that fluctuate around the true zero coherence in the corresponding squared coherence plots of Figure~\ref{fig:squared_coh} (visible as they are plotted on a log-scale). Notably, the median squared coherence fluctuations are lower than those expected from uncorrelated white noise data, which scale as approximitaly the inverse of the number of data segments used to average over. In this case, i.e.  $1/N_b = 0.008$. The squared coherence estimates based on the SGVB method are below this estimate and hence are consistent with zero coherence.
 
+% \pmr{The sentence below should say: In case C, where the three channels are assumed independent, the model assumes zero cross spectrum (the XY, YZ, XZ components) in the PSD estimates.  Consequently, the squared coherence between any pair of channels is uniformly zero across all frequencies, which is consistent with theoretical expectations for uncorrelated channels, providing a baseline to assess the degree of correlation in the other cases.}
 
-In case C, where the three channels are assumed independent, the estimated spectral densities yield zero off-diagonal (the XY, YZ, XZ components) PSD estimates.
-Consequently, the squared coherence between any pair of channels is uniformly zero across all frequencies. 
-This result aligns with theoretical expectations for uncorrelated channels,  providing a baseline to assess the degree of correlation in the other cases.
-Comparing case B and C teaches us two important features about the effectiveness of our SGVB model. First of all, as one would expect, a model with less complexity (case C) typically yields a more accurate estimate compared to a more complex model (case B). More concretely, the average RMS\footnote{The average RMS is calculated as the mean of the square root of the mean squared values of the expected median spectral density matrix elements across the frequency band.
-} over the frequency band 0 to \SI{128}{Hz}  is $2.592 \times 10^{-49}$ for case B and $2.586 \times 10^{-49}$ for case C. However, the difference between both different scenario's is relatively small, showcasing the huge potential and flexibility of the SGVB approach in esitmating detector noise whether correlated noise is present or not.
+In case C, where the three channels are assumed independent, the model assumes zero cross spectrum (the XY, YZ, XZ components) in the PSD estimates.  Consequently, the squared coherence between any pair of channels is uniformly zero across all frequencies, which is consistent with theoretical expectations for uncorrelated channels, providing a baseline to assess the degree of correlation in the other cases.
+Comparing case B and C teaches us two important features about the effectiveness of our SGVB model. First of all, as one would expect, a model with less complexity (case C) typically yields a more accurate estimate compared to a more complex model (case B). More concretely, the average root mean square deviation (RMSD)\footnote{The average RMSD is calculated as the mean of the square root of the mean squared differences between the estimated median PSD and the true PSD across the frequency band for X, Y and Z channels.} over the frequency band 5 to \SI{128}{Hz}  is $9.773 \times 10^{-50}$ for case B and $9.725 \times 10^{-50}$ for case C. The difference between both different scenario's is relatively small, showcasing the huge potential and flexibility of the SGVB approach in estimating detector noise whether correlated noise is present or not.
 
 
 These findings collectively demonstrate the capability of this spectral estimation technique to characterize both the individual channel spectra and the inter-channel correlations across various noise scenarios.
-Furthermore, the clear differentiation between the correlated (case A), minimally correlated (case B), and uncorrelated (case C) scenarios validates the robustness of our analytical approach.
+Furthermore, the clear differentiation between cases A, B, and C validates the robustness of our analytical approach. The comparison between cases B and C, which use identical data but different models, particularly highlights the impact of model choice on the results, as we still find minimal correlations (within the expectation obtained from the Welsch estimate) in case B. 
 
 
 
