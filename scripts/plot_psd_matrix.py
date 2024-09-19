@@ -143,6 +143,9 @@ def plot_et_matrix(
     freq = freq_original[0:int(required_part / freq_range * freq_original.shape[0])]
     freq_true = ET_1[:,0]
 
+    # save freq
+    np.savez(f"freq_psd.npz", freq)
+
     if axes is None:
         fig, axes = plt.subplots(3, 3, figsize=(10, 10), sharex=True)
 
