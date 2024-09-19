@@ -12,17 +12,15 @@ PSD_FILL_ALPHA = 0.3
 
 
 def compute_true_coherence():
-    file_path = f'{paths.data}/ET(1).txt'
-    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+    with h5py.File(f'{paths.data}/ET_caseA_noise.h5', 'r') as f:
+        
+        true_psd_group = f['True PSD']
+        
+        ET_1 = true_psd_group['ET_1'][:]
+        Peak10Hz = true_psd_group['Peak10Hz'][:]
+        Peak50Hz = true_psd_group['Peak50Hz'][:]
+        Peak90Hz = true_psd_group['Peak90Hz'][:]
 
-    file_path = f'{paths.data}/Peak10Hz_new.txt'
-    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak50Hz_new.txt'
-    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak90Hz_new.txt'
-    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
 
     ASD_X = ET_1[:, 1] + Peak10Hz[:, 1] + Peak50Hz[:, 1]
     ASD_Y = ET_1[:, 1] + Peak10Hz[:, 1] + Peak90Hz[:, 1]
@@ -47,17 +45,14 @@ def plot_coherences(coherence_file_path, ax=None, case='A'):
 
     # Load additional datasets for case A
     if case == 'A':
-        file_path = f'{paths.data}/ET(1).txt'
-        ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-        file_path = f'{paths.data}/Peak10Hz_new.txt'
-        Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-        file_path = f'{paths.data}/Peak50Hz_new.txt'
-        Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-        file_path = f'{paths.data}/Peak90Hz_new.txt'
-        Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+        with h5py.File(f'{paths.data}/ET_caseA_noise.h5', 'r') as f:
+            
+            true_psd_group = f['True PSD']
+            
+            ET_1 = true_psd_group['ET_1'][:]
+            Peak10Hz = true_psd_group['Peak10Hz'][:]
+            Peak50Hz = true_psd_group['Peak50Hz'][:]
+            Peak90Hz = true_psd_group['Peak90Hz'][:]
 
         ASD_X = ET_1[:, 1] + Peak10Hz[:, 1] + Peak50Hz[:, 1]
         ASD_Y = ET_1[:, 1] + Peak10Hz[:, 1] + Peak90Hz[:, 1]
