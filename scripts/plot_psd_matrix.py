@@ -29,25 +29,23 @@ def load_posterior_matrix(matrix_file_path):
 
 def load_raw_data(channel_pth):
     channels = []
-    for i, c in enumerate('XYZ'):
-        with h5py.File(channel_pth.format(c), 'r') as f:
-            channels.append(f[f'E{i + 1}:STRAIN'][:])
+    with h5py.File(channel_pth, 'r') as f:
+        for c in ['X', 'Y', 'Z']:
+            channels.append(f[c][:])
     channels = np.column_stack(channels)
     return channels
 
 def load_true_psd():
     # upload the true psd data
-    file_path = f'{paths.data}/ET(1).txt'
-    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
 
-    file_path = f'{paths.data}/Peak10Hz_new.txt'
-    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak50Hz_new.txt'
-    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak90Hz_new.txt'
-    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+    with h5py.File(f'{paths.data}/ET_caseA_noise_small.h5', 'r') as f:
+        
+        true_psd_group = f['True PSD']
+        
+        ET_1 = true_psd_group['ET_1'][:]
+        Peak10Hz = true_psd_group['Peak10Hz'][:]
+        Peak50Hz = true_psd_group['Peak50Hz'][:]
+        Peak90Hz = true_psd_group['Peak90Hz'][:]
 
     x_channel_real = ((ET_1[:, 1] ** 2 + Peak10Hz[:, 1] ** 2 + Peak50Hz[:, 1] ** 2)) / 2
     y_channel_real = ((ET_1[:, 1] ** 2 + Peak10Hz[:, 1] ** 2 + Peak90Hz[:, 1] ** 2)) / 2
@@ -61,7 +59,7 @@ def load_freq():
     nchunks = 125
     required_part = 128
 
-    channel_pth = str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5"
+    channel_pth = str(paths.data) + "/ET_caseA_noise_small.h5"
     channels = load_raw_data(channel_pth)
     Ts = 1 / (channels.shape[0] / time_interval)
     freq_original = np.fft.fftfreq(int(np.size(channels, 0) / nchunks), Ts)
@@ -90,9 +88,15 @@ def plot_et_matrix(
         label=""
 ):
     channels = []
-    for i, c in enumerate('XYZ'):
-        with h5py.File(channel_pth.format(c), 'r') as f:
-            channels.append(f[f'E{i + 1}:STRAIN'][:])
+    
+    
+    
+    
+    with h5py.File(channel_pth, 'r') as f:
+        for c in ['X', 'Y', 'Z']:
+            channels.append(f[c][:])
+    channels = np.column_stack(channels)
+
 
     # ----------------------------------------------------------------------------------------------
     channels = np.column_stack(channels)
@@ -105,17 +109,14 @@ def plot_et_matrix(
         spec_mat_upper = f['ETnoise_correlated_GP_spec_mat_upper_XYZ'][:]
         
     # upload the true psd data
-    file_path =f'{paths.data}/ET(1).txt'
-    ET_1 = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak10Hz_new.txt'
-    Peak10Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak50Hz_new.txt'
-    Peak50Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
-
-    file_path = f'{paths.data}/Peak90Hz_new.txt'
-    Peak90Hz = pd.read_csv(file_path, delim_whitespace=True, header=None).values
+    with h5py.File(f'{paths.data}/ET_caseA_noise_small.h5', 'r') as f:
+        
+        true_psd_group = f['True PSD']
+        
+        ET_1 = true_psd_group['ET_1'][:]
+        Peak10Hz = true_psd_group['Peak10Hz'][:]
+        Peak50Hz = true_psd_group['Peak50Hz'][:]
+        Peak90Hz = true_psd_group['Peak90Hz'][:]
 
     x_channel_real = ((ET_1[:,1]**2 + Peak10Hz[:,1]**2 + Peak50Hz[:,1]**2))/2
     y_channel_real = ((ET_1[:,1]**2 + Peak10Hz[:,1]**2 + Peak90Hz[:,1]**2))/2
@@ -295,8 +296,8 @@ def plot_et_matrix(
 
 def __plot_A():
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
+        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C0",
         label="Case A PSD"
     )
@@ -304,14 +305,14 @@ def __plot_A():
 
 def __plot_AD():
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
+        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C0",
         label="Case A PSD"
     )
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_no_cross_correlated_GP_uniform_spec_matrices_XYZ.hdf5',
+        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        matrix_file_path=f'{paths.data}/ETnoise_no_cross_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C3",
         axes=axes,
         label="Case D PSD"
@@ -333,14 +334,14 @@ def __plot_BC():
 
 
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
+        channel_pth=str(paths.data) + "/ET_caseB_noise_small.h5",
+        matrix_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C1",
         label="Case B PSD"
     )
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/{}_ETnoise_GP_uncorr.hdf5",
-        matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.hdf5',
+        channel_pth=str(paths.data) + "/ET_caseB_noise_small.h5",
+        matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C2",
         axes=axes,
         label="Case C PSD"
