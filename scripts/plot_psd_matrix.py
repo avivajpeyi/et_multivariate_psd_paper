@@ -59,7 +59,7 @@ def load_freq():
     nchunks = 125
     required_part = 128
 
-    channel_pth = str(paths.data) + "/ET_caseA_noise_small.h5"
+    channel_pth = "ET_caseA_noise_small.h5"
     channels = load_raw_data(channel_pth)
     Ts = 1 / (channels.shape[0] / time_interval)
     freq_original = np.fft.fftfreq(int(np.size(channels, 0) / nchunks), Ts)
@@ -296,7 +296,7 @@ def plot_et_matrix(
 
 def __plot_A():
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        channel_pth="ET_caseA_noise_small.h5",
         matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C0",
         label="Case A PSD"
@@ -305,13 +305,13 @@ def __plot_A():
 
 def __plot_AD():
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        channel_pth="ET_caseA_noise_small.h5",
         matrix_file_path=f'{paths.data}/ETnoise_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C0",
         label="Case A PSD"
     )
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/ET_caseA_noise_small.h5",
+        channel_pth="ET_caseA_noise_small.h5",
         matrix_file_path=f'{paths.data}/ETnoise_no_cross_correlated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C3",
         axes=axes,
@@ -334,13 +334,13 @@ def __plot_BC():
 
 
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/ET_caseB_noise_small.h5",
+        channel_pth="ET_caseB_noise_small.h5",
         matrix_file_path=f'{paths.data}/ETnoise_uncorrelated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C1",
         label="Case B PSD"
     )
     axes = plot_et_matrix(
-        channel_pth=str(paths.data) + "/ET_caseB_noise_small.h5",
+        channel_pth="ET_caseB_noise_small.h5",
         matrix_file_path=f'{paths.data}/ETnoise_no_cross_uncorrelated_GP_uniform_spec_matrices_XYZ.h5',
         psd_col="C2",
         axes=axes,

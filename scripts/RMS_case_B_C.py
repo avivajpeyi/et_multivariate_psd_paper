@@ -3,7 +3,7 @@ import numpy as np
 import paths
 from scipy import interpolate as interp
 
-with h5py.File(f'{paths.data}/ET_caseA_noise.h5', 'r') as f:
+with h5py.File(f'{paths.data}/ET_caseA_noise_small.h5', 'r') as f:
     
     true_psd_group = f['True PSD']
     

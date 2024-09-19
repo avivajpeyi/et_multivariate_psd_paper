@@ -12,7 +12,7 @@ PSD_FILL_ALPHA = 0.3
 
 
 def compute_true_coherence():
-    with h5py.File(f'{paths.data}/ET_caseA_noise.h5', 'r') as f:
+    with h5py.File(f'{paths.data}/ET_caseA_noise_small.h5', 'r') as f:
         
         true_psd_group = f['True PSD']
         
@@ -45,7 +45,7 @@ def plot_coherences(coherence_file_path, ax=None, case='A'):
 
     # Load additional datasets for case A
     if case == 'A':
-        with h5py.File(f'{paths.data}/ET_caseA_noise.h5', 'r') as f:
+        with h5py.File(f'{paths.data}/ET_caseA_noise_small.h5', 'r') as f:
             
             true_psd_group = f['True PSD']
             
