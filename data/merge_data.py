@@ -48,7 +48,7 @@ def load_files():
         case_psds[group] = load_file(fname)
     return case_psds
 
-data = load_files()
+
 
 
 
@@ -61,7 +61,7 @@ def save_data(data):
                 f.create_dataset(f"{group}/{new_key}", data=data[group][new_key])
         f['freq'] = freq_data['arr_0']
 
-save_data(data)
+
 
 
 def load_new_data(case):
@@ -77,13 +77,15 @@ def load_new_data(case):
     return np.array(quantiles), freq
 
 
+# save_data(data)
+# data = load_files()
 
 caseA = load_new_data("CaseA")
 
 axes = plot_psdq(
         caseA[0], caseA[1],
 )
-format_axes(axes, xlims=[5, 128])
+format_axes(axes, xlims=[5, 128], sylmog_thresh=1e-49, off_ylims=[-3, 3])
 plt.savefig("TEST.png")
 
 
