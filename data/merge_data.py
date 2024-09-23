@@ -35,7 +35,11 @@ def load_file(fname):
     psd_quantiles = {}
     with h5py.File(os.path.join(HERE, fname), 'r') as f:
         for key, new_key in zip(keys, new_keys):
-            psd_quantiles[new_key] = f[key][:]
+            psd_q = f[key][:]
+            re_ = np.real(psd_q) / q / origFmax
+            im_ = np.imag(psd_q) / q / origFmax
+            psd_quantiles[new_key] = re_ + 1j * im_
+
     return psd_quantiles
 
 def load_files():
@@ -83,5 +87,3 @@ format_axes(axes, xlims=[5, 128])
 plt.savefig("TEST.png")
 
 
-#
-# qtils == qtls( complex(X) * scaling )
